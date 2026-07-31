@@ -1,5 +1,6 @@
 import npdsp as dsp
 
+
 def main() -> None:
     delay = dsp.Delay(2)
 

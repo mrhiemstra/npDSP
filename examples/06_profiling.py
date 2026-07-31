@@ -1,5 +1,7 @@
 import numpy as np
+
 import npdsp as dsp
+
 
 def main() -> None:
     pipeline = (

@@ -5,7 +5,6 @@ from pathlib import Path
 
 import npdsp
 
-
 SOURCE = Path(__file__).parent
 GENERATED = SOURCE / "generated"
 API = SOURCE / "api.rst"
@@ -55,7 +54,7 @@ def generate_object_page(name: str, obj: object) -> None:
         title,
         underline,
         "",
-        f".. currentmodule:: npdsp",
+        ".. currentmodule:: npdsp",
         "",
         f".. autoclass:: npdsp.{name}",
         "   :members:",
