@@ -60,7 +60,7 @@ class Pipeline(Block):
             Blocks to include in the pipeline. Nested pipelines are flattened
             into the new pipeline.
         """
-        super().__init__(name = None)
+        super().__init__(name=None)
         self.blocks: list[Block] = []
         self._names: dict[str, int] = {}
 
@@ -103,7 +103,7 @@ class Pipeline(Block):
             Raised if the pipeline contains no blocks.
         """
         return self.blocks[-1]
-    
+
     def _reindex(self) -> None:
         """Rebuild the mapping between block names and their indices.
 
@@ -197,8 +197,7 @@ class Pipeline(Block):
         for block in self.blocks:
             block.reset()
             if block.stateful:
-                print(f'Reset stateful block {block}')
-
+                print(f"Reset stateful block {block}")
 
     def profile(self, x: Signal, runs: int = 1, reset: bool = False) -> ProfileResults:
         """Profile the execution time of each block in the pipeline.
@@ -235,9 +234,9 @@ class Pipeline(Block):
             run_times: list[float] = []
 
             _x = x
-            
+
             for _ in range(runs):
-                start = perf_counter() 
+                start = perf_counter()
 
                 _x = block(x)
 
@@ -249,19 +248,20 @@ class Pipeline(Block):
             min_time = np.min(run_times).astype(float)
             mean_time = np.mean(run_times).astype(float)
             max_time = np.max(run_times).astype(float)
-            
-            results.append(ProfileResult(
-                            name=block.name or block.__class__.__name__,
-                            min_time=min_time,
-                            mean_time=mean_time,
-                            max_time=max_time
-                        ))
-            
+
+            results.append(
+                ProfileResult(
+                    name=block.name or block.__class__.__name__,
+                    min_time=min_time,
+                    mean_time=mean_time,
+                    max_time=max_time,
+                )
+            )
+
         if reset:
             self.reset()
 
         return results
-
 
     def state(self) -> None:
         """Display or inspect the state of the pipeline.
@@ -309,7 +309,6 @@ class Pipeline(Block):
                 instances.append(block)
 
         return instances
-        
 
     def insert(self, key: int | str, block: Block) -> None:
         """Insert a block before the block at the specified position.
@@ -336,7 +335,6 @@ class Pipeline(Block):
         del self.blocks[self._resolve_block_index(key)]
         self._reindex()
 
-
     def replace(self, key: int | str, block: Block) -> None:
         """Replace a block in the pipeline.
 
@@ -349,7 +347,6 @@ class Pipeline(Block):
         """
         self.blocks[self._resolve_block_index(key)] = block
         self._reindex()
-
 
     def __setitem__(self, key: int | str, block: Block) -> None:
         """Replace a block using item assignment.
@@ -391,7 +388,7 @@ class Pipeline(Block):
             return item in self._names
         else:  # Block
             return item in self.blocks
-    
+
     def __rshift__(self, other: Pipeline | Block) -> Pipeline:
         """Append a block or pipeline and return a new pipeline.
 
@@ -407,7 +404,7 @@ class Pipeline(Block):
         """
         if isinstance(other, Pipeline):
             return Pipeline(*self.blocks, *other.blocks)
-        return Pipeline(*self.blocks,other)
+        return Pipeline(*self.blocks, other)
 
     def __irshift__(self, other: Pipeline | Block) -> Self:
         """Append a block or pipeline to this pipeline in place.
@@ -430,7 +427,9 @@ class Pipeline(Block):
         self._reindex()
         return self
 
-    def __getitem__(self, key: str | int | slice | tuple[str | int | slice, EllipsisType]) -> Pipeline | Block:
+    def __getitem__(
+        self, key: str | int | slice | tuple[str | int | slice, EllipsisType]
+    ) -> Pipeline | Block:
         """Retrieve a block or sub-pipeline.
 
         Parameters
@@ -464,22 +463,23 @@ class Pipeline(Block):
         """
         inclusive_stop = False
         if isinstance(key, tuple):
-            if not ( len(key) == 2 and key[1] is Ellipsis):
-                raise TypeError(f"Expected key to be (str | int | slice, Ellipsis)), but {key=}")
+            if not (len(key) == 2 and key[1] is Ellipsis):
+                raise TypeError(
+                    f"Expected key to be (str | int | slice, Ellipsis)), but {key=}"
+                )
             key, _ = key
             inclusive_stop = True
 
-
         if isinstance(key, str):
             return self.blocks[self._names[key]]
-        
+
         elif isinstance(key, int):
             return self.blocks[key]
-        
+
         else:  # Slice
             if key.step is not None:
                 raise NotImplementedError("Slice steps are not implemented")
-            
+
             start = self._resolve_slice_index(key.start)
             stop = self._resolve_slice_index(key.stop)
 
@@ -487,7 +487,7 @@ class Pipeline(Block):
                 stop += 1
 
             return Pipeline(*self.blocks[start:stop])
-        
+
     def __repr__(self) -> str:
         """Return a string representation of the pipeline.
 

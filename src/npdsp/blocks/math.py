@@ -328,7 +328,7 @@ class Power(Block):
             Input signal raised element-wise to ``self.value`` using NumPy
             broadcasting rules.
         """
-        return x ** self.value
+        return x**self.value
 
 
 class Absolute(Block):
@@ -349,7 +349,7 @@ class Absolute(Block):
             Optional name used to identify the block within a pipeline.
         """
         super().__init__(name=name)
-        
+
     def process(self, x: Signal) -> Signal:
         """Calculate the absolute value of the input signal.
 

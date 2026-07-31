@@ -38,16 +38,12 @@ def test_profile_elapsed_positive(
     assert all(r.max_time >= 0 for r in results)
 
 
-
 def test_profile_total_time(
     math_pipeline: Pipeline,
 ) -> None:
     results = math_pipeline.profile(np.array([1]))
 
-    assert results.tottime == sum(
-        r.mean_time
-        for r in results
-    )
+    assert results.tottime == sum(r.mean_time for r in results)
 
 
 def test_profile_string(

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import inspect
+from collections.abc import Callable
 from pathlib import Path
+from typing import cast
 
 import npdsp
 
@@ -39,7 +41,7 @@ def get_category(obj: object) -> str:
 
 def format_signature(obj: object) -> str:
     try:
-        return str(inspect.signature(obj))
+        return str(inspect.signature(cast(Callable[..., object], obj)))
     except (TypeError, ValueError):
         return ""
 
@@ -103,14 +105,16 @@ def generate() -> None:
         if not names:
             continue
 
-        lines.extend([
-            category,
-            "-" * len(category),
-            "",
-            ".. toctree::",
-            "   :maxdepth: 1",
-            "",
-        ])
+        lines.extend(
+            [
+                category,
+                "-" * len(category),
+                "",
+                ".. toctree::",
+                "   :maxdepth: 1",
+                "",
+            ]
+        )
 
         for name in sorted(names):
             lines.append(f"   generated/{name}")

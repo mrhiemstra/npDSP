@@ -9,5 +9,5 @@ __all__ = [
     "ProfileResult",
     "ProfileResults",
     "Signal",
-    "SignalLike"
+    "SignalLike",
 ]

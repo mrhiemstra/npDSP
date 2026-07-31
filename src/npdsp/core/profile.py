@@ -55,11 +55,7 @@ class ProfileResults(list[ProfileResult]):
         float
             Total mean execution time in seconds.
         """
-        return sum(
-            (result.mean_time
-            for result in self),
-            0.0
-        )
+        return sum((result.mean_time for result in self), 0.0)
 
     def __str__(self) -> str:
         """Return a human-readable representation of the profiling results.
@@ -73,6 +69,10 @@ class ProfileResults(list[ProfileResult]):
         str
             Formatted profiling results with SI-prefixed execution times.
         """
-        return "\n".join(
-            f'{result.name} {si_format(result.mean_time, precision=3)}s {100*result.mean_time/self.tottime:.2f}%' 
-            for result in self) + f'\n{si_format(self.tottime, precision=3)}s'
+        return (
+            "\n".join(
+                f"{result.name} {si_format(result.mean_time, precision=3)}s {100 * result.mean_time / self.tottime:.2f}%"
+                for result in self
+            )
+            + f"\n{si_format(self.tottime, precision=3)}s"
+        )

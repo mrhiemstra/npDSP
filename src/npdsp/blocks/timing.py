@@ -66,7 +66,7 @@ class Delay(Block):
 
         if samples < 0:
             raise ValueError("samples must be non-negative")
-        
+
         self.samples = samples
         self._buffer: Signal | None = None
 
@@ -89,19 +89,13 @@ class Delay(Block):
             return x
 
         if self._buffer is None:
-            self._buffer = np.zeros(
-                (self.samples, *x.shape[1:]),
-                dtype=x.dtype
-            )
+            self._buffer = np.zeros((self.samples, *x.shape[1:]), dtype=x.dtype)
 
-        combined = np.concatenate(
-            (self._buffer, x),
-            axis=0
-        )
+        combined = np.concatenate((self._buffer, x), axis=0)
 
-        output = combined[:len(x)]
+        output = combined[: len(x)]
 
-        self._buffer = combined[len(x):]
+        self._buffer = combined[len(x) :]
 
         return output
 

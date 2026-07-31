@@ -19,9 +19,7 @@ def test_identity_pipeline(
 def test_pipeline_order(
     math_pipeline: Pipeline,
 ) -> None:
-    result = math_pipeline(
-        np.array([1, 2])
-    )
+    result = math_pipeline(np.array([1, 2]))
 
     assert np.array_equal(
         result,
@@ -32,9 +30,7 @@ def test_pipeline_order(
 def test_pipeline_accepts_list(
     math_pipeline: Pipeline,
 ) -> None:
-    result = math_pipeline(
-        [1, 2]
-    )
+    result = math_pipeline([1, 2])
 
     assert np.array_equal(
         result,
@@ -49,6 +45,7 @@ def test_pipeline_is_callable(
 
     assert result[0] == 6
 
+
 def test_pipeline_and_block_profile_same_output(
     math_pipeline: Pipeline,
 ) -> None:
@@ -56,7 +53,5 @@ def test_pipeline_and_block_profile_same_output(
 
     assert np.array_equal(
         math_pipeline(x),
-        (math_pipeline.blocks[1](
-            math_pipeline.blocks[0](x)
-        )),
+        (math_pipeline.blocks[1](math_pipeline.blocks[0](x))),
     )

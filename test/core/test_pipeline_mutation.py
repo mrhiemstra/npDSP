@@ -96,6 +96,7 @@ def test_delitem(
 
     assert "tap2" not in pipeline
 
+
 def test_replace_updates_names(
     pipeline: Pipeline,
 ) -> None:

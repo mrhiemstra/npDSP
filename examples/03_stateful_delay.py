@@ -10,7 +10,8 @@ def main() -> None:
     delay.reset()
 
     print(delay([7, 8, 9]))
-    print(delay([10])) # Unequal subsequent input signal lengths are allowed
+    print(delay([10]))  # Unequal subsequent input signal lengths are allowed
+
 
 if __name__ == "__main__":
     main()

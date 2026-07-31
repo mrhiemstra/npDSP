@@ -99,6 +99,7 @@ def test_slice_step_not_supported(
     with pytest.raises(NotImplementedError):
         pipeline[::2]
 
+
 def test_slice_to_end_inclusive(
     pipeline: Pipeline,
 ) -> None:
@@ -106,12 +107,14 @@ def test_slice_to_end_inclusive(
 
     assert len(result) == 2
 
+
 def test_slice_all(
     pipeline: Pipeline,
 ) -> None:
     result = pipeline[:]
 
     assert len(result) == len(pipeline)
+
 
 def test_contains_block(
     pipeline: Pipeline,

@@ -14,9 +14,9 @@ sys.path.insert(0, str(ROOT / "src"))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'npDSP'
-copyright = '2026, Martijn Hiemstra'
-author = 'Martijn Hiemstra'
+project = "npDSP"
+copyright = "2026, Martijn Hiemstra"
+author = "Martijn Hiemstra"
 release = npdsp.__version__
 
 # -- General configuration ---------------------------------------------------
@@ -30,15 +30,15 @@ extensions = [
 ]
 
 autosummary_generate = True
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['']
+html_theme = "sphinx_rtd_theme"
+html_static_path = [""]
 
 sys.path.insert(0, str(Path(__file__).parent))
 

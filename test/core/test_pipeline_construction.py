@@ -102,6 +102,7 @@ def test_duplicate_names_raise() -> None:
             Tap("same"),
         )
 
+
 def test_block_length(
     tap1: Tap,
 ) -> None:

@@ -24,10 +24,7 @@ uv add npDSP
 import numpy as np
 import npdsp
 
-pipeline = (
-    npdsp.Add(1)
-    >> npdsp.Multiply(2)
-)
+pipeline = npdsp.Add(1) >> npdsp.Multiply(2)
 
 x = np.array([1, 2, 3])
 
@@ -40,10 +37,7 @@ print(y)
 Blocks can also be given names and accessed through a pipeline:
 
 ```python
-pipeline = (
-    npdsp.Add(1, name="offset")
-    >> npdsp.Multiply(2, name="gain")
-)
+pipeline = npdsp.Add(1, name="offset") >> npdsp.Multiply(2, name="gain")
 
 print(pipeline["gain"])
 ```

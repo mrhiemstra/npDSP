@@ -15,10 +15,11 @@ def main() -> None:
 
     x = np.arange(5)
     print(pipeline(x))
-    print(pipeline[:"gain"](x)) #Pipeline data upto the input of "gain"
-    print(pipeline[:"gain",...](x)) #Pipeline data upto the output of "gain"
-    print(pipeline["gain":](x)) #From input "gain" upto end of pipeline
-    print(pipeline["gain"](x)) #From input "gain" to output of "gain"
+    print(pipeline[:"gain"](x))  # Pipeline data upto the input of "gain"
+    print(pipeline[:"gain", ...](x))  # Pipeline data upto the output of "gain"
+    print(pipeline["gain":](x))  # From input "gain" upto end of pipeline
+    print(pipeline["gain"](x))  # From input "gain" to output of "gain"
+
 
 if __name__ == "__main__":
     main()

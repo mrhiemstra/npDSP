@@ -107,7 +107,7 @@ class Block(ABC):
         run_times: list[float] = []
 
         for _ in range(runs):
-            start = perf_counter() 
+            start = perf_counter()
 
             x = self(x)
 
@@ -121,12 +121,14 @@ class Block(ABC):
         mean_time = np.mean(run_times)
         max_time = np.max(run_times)
 
-        results.append(ProfileResult(
-                        name=self.name or self.__class__.__name__,
-                        min_time=min_time,
-                        mean_time=mean_time,
-                        max_time=max_time
-                    ))
+        results.append(
+            ProfileResult(
+                name=self.name or self.__class__.__name__,
+                min_time=min_time,
+                mean_time=mean_time,
+                max_time=max_time,
+            )
+        )
 
         return results
 
@@ -183,11 +185,9 @@ class Block(ABC):
             attributes.
         """
         args = ", ".join(
-            f'{k}={v!r}'
-            for k, v in self.__dict__.items()
-            if v is not None
+            f"{k}={v!r}" for k, v in self.__dict__.items() if v is not None
         )
-        return f'{self.__class__.__name__}({args})'
+        return f"{self.__class__.__name__}({args})"
 
     __str__ = __repr__
 

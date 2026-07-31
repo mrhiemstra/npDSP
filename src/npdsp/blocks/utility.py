@@ -15,7 +15,9 @@ class Lambda(Block):
         Optional name used to identify the block within a pipeline.
     """
 
-    def __init__(self, func: Callable[[Signal], Signal], name: str | None = None) -> None:
+    def __init__(
+        self, func: Callable[[Signal], Signal], name: str | None = None
+    ) -> None:
         """Initialize a lambda block.
 
         Parameters
