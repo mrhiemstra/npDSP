@@ -61,6 +61,25 @@ jobs:
       - name: Check lint
         run: uv run ruff check .
 
+  typecheck:
+    name: Pyright
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Run Pyright
+        run: uv run pyright
+        
   docs:
     name: Documentation
     runs-on: ubuntu-latest
