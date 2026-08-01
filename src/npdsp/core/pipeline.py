@@ -51,7 +51,7 @@ class Pipeline(Block):
         pipeline["first":"last", ...]
     """
 
-    def __init__(self, *blocks: Block | Pipeline):
+    def __init__(self, *blocks: Block | Pipeline, name: str | None = None) -> None:
         """Initialize a pipeline.
 
         Parameters
@@ -59,8 +59,11 @@ class Pipeline(Block):
         *blocks : Block or Pipeline
             Blocks to include in the pipeline. Nested pipelines are flattened
             into the new pipeline.
+        name : str, optional
+            Optional name used to identify the pipeline in a graph.
+
         """
-        super().__init__(name=None)
+        super().__init__(name=name)
         self.blocks: list[Block] = []
         self._names: dict[str, int] = {}
 
