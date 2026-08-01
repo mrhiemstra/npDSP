@@ -158,7 +158,7 @@ class Block(ABC):
         """
         return self.process(np.asarray(x))
 
-    def __rshift__(self, other: Block | Pipeline):
+    def __rshift__(self, other: Block | Pipeline) -> Pipeline:
         """Compose this block with another block or pipeline.
 
         Parameters
