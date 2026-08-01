@@ -19,6 +19,7 @@ from .timing import Delay
 from .utility import Lambda, ResetCounter, Tap
 
 __all__ = [
+    "FIR",
     "Absolute",
     "Add",
     "Clip",
@@ -26,7 +27,6 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
-    "FIR",
     "Floor",
     "Lambda",
     "Maximum",

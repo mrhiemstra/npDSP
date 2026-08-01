@@ -6,6 +6,7 @@ from .core import *
 __version__ = version("npdsp")
 
 __all__ = [
+    "FIR",
     "Absolute",
     "Add",
     "Block",
@@ -14,7 +15,6 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
-    "FIR",
     "Floor",
     "Lambda",
     "Maximum",

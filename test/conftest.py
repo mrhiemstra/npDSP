@@ -38,4 +38,4 @@ def math_pipeline() -> Pipeline:
 
 @pytest.fixture
 def fir1() -> FIR:
-    return FIR([1,2,3],name="fir1")
+    return FIR([1, 2, 3], name="fir1")

@@ -5,7 +5,6 @@ import numpy as np
 from ..core import Block, Signal, SignalLike
 
 
-
 class FIR(Block):
     """Finite impulse response filter.
 
@@ -16,7 +15,7 @@ class FIR(Block):
     The final axis is the sample axis. Leading dimensions identify independent
     signals. Once processing has started, leading dimensions cannot change;
     the sample-axis length may vary between calls.
-    
+
     Parameters
     ----------
     coefs : array-like
@@ -149,12 +148,14 @@ class FIR(Block):
         )
 
         for k in range(taps):
-            y += coefs[..., k, np.newaxis] * extended[
-                ...,
-                taps - 1 - k : taps - 1 - k + x.shape[-1],
-            ]
+            y += (
+                coefs[..., k, np.newaxis]
+                * extended[
+                    ...,
+                    taps - 1 - k : taps - 1 - k + x.shape[-1],
+                ]
+            )
 
         self._state = extended[..., -(taps - 1) :].copy()
 
         return y
-

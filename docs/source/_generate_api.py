@@ -3,8 +3,8 @@ from __future__ import annotations
 import inspect
 from collections.abc import Callable
 from pathlib import Path
-from typing import cast
 from shutil import rmtree
+from typing import cast
 
 import npdsp
 
