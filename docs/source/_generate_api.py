@@ -4,6 +4,7 @@ import inspect
 from collections.abc import Callable
 from pathlib import Path
 from typing import cast
+from shutil import rmtree
 
 import npdsp
 
@@ -68,7 +69,10 @@ def generate_object_page(name: str, obj: object) -> None:
 
 
 def generate() -> None:
-    GENERATED.mkdir(parents=True, exist_ok=True)
+    if GENERATED.exists() and GENERATED.is_dir():
+        rmtree(GENERATED)
+
+    GENERATED.mkdir(parents=True, exist_ok=False)
 
     groups: dict[str, list[str]] = {}
 
