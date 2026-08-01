@@ -7,6 +7,7 @@ __version__ = version("npdsp")
 
 __all__ = [
     "FIR",
+    "IIR",
     "Absolute",
     "Add",
     "Block",

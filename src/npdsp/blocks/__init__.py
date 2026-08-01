@@ -1,5 +1,6 @@
 from .conversion import Convert
 from .fir import FIR
+from .iir import IIR
 from .math import (
     Absolute,
     Add,
@@ -20,6 +21,7 @@ from .utility import Lambda, ResetCounter, Tap
 
 __all__ = [
     "FIR",
+    "IIR",
     "Absolute",
     "Add",
     "Clip",
