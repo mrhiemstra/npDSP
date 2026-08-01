@@ -14,6 +14,7 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
+    "FIR",
     "Floor",
     "Lambda",
     "Maximum",

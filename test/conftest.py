@@ -34,3 +34,8 @@ def pipeline(
 @pytest.fixture
 def math_pipeline() -> Pipeline:
     return Add(2) >> Multiply(3)
+
+
+@pytest.fixture
+def fir1() -> FIR:
+    return FIR([1,2,3],name="fir1")

@@ -1,4 +1,5 @@
 from .conversion import Convert
+from .fir import FIR
 from .math import (
     Absolute,
     Add,
@@ -25,6 +26,7 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
+    "FIR",
     "Floor",
     "Lambda",
     "Maximum",
