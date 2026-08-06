@@ -1,4 +1,4 @@
-from .conversion import Convert
+from .conversion import Convert, Downsample, Upsample
 from .fir import FIR
 from .iir import IIR
 from .math import (
@@ -29,6 +29,7 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
+    "Downsample",
     "Floor",
     "Lambda",
     "Maximum",
@@ -40,4 +41,5 @@ __all__ = [
     "ResetCounter",
     "Subtract",
     "Tap",
+    "Upsample",
 ]

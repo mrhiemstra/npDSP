@@ -16,6 +16,7 @@ __all__ = [
     "Convert",
     "Delay",
     "Divide",
+    "Downsample",
     "Floor",
     "Lambda",
     "Maximum",
@@ -32,4 +33,5 @@ __all__ = [
     "SignalLike",
     "Subtract",
     "Tap",
+    "Upsample",
 ]

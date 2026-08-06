@@ -76,6 +76,10 @@ class FIR(Block):
         """Whether the filter maintains state between calls."""
         return True
 
+    @property
+    def latency_samples(self) -> float:
+        return (len(self.coefs) - 1) / 2
+
     def reset(self) -> None:
         """Reset the filter state."""
         self._history.reset()

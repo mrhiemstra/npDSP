@@ -142,6 +142,10 @@ class IIR(Block):
         """Whether the filter maintains state between calls."""
         return True
 
+    @property
+    def latency_samples(self) -> None:
+        return None
+
     def reset(self) -> None:
         """Clear all retained filter state."""
         self._input_shape = None

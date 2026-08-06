@@ -73,7 +73,8 @@ class Pipeline(Block):
             else:
                 self.blocks.append(block)
 
-        self._reindex()
+        if self.blocks:
+            self._reindex()
 
     @property
     def first(self) -> Block:
@@ -107,8 +108,43 @@ class Pipeline(Block):
         """
         return self.blocks[-1]
 
+    @property
+    def sample_rate(self) -> float:
+        rate = 1
+
+        for block in self.blocks:
+            rate *= block.sample_rate_ratio
+
+        return rate
+
+    @property
+    def latency_samples(self) -> float | None:
+        latency: float = 0
+
+        for block in self.blocks:
+            latency += block.latency_samples if block.latency_samples is not None else 0
+
+        return latency
+
+    @property
+    def has_frequency_dependent_latency(self) -> bool:
+        return any(block.latency_samples is None for block in self.blocks)
+
+    @property
+    def latency(self) -> float:
+        if self.has_frequency_dependent_latency:
+            raise NotImplementedError(
+                "Frequency dependent latency reporting is not yet implemented"
+            )
+
+        assert self.first.sample_rate is not None
+        assert self.latency_samples is not None
+
+        return self.latency_samples / self.first.sample_rate
+
     def _reindex(self) -> None:
-        """Rebuild the mapping between block names and their indices.
+        """Rebuild the mapping between block names and their indices,
+        and the sample rate calculations
 
         Unnamed blocks are ignored. Block names must be unique within the
         pipeline.
@@ -120,6 +156,10 @@ class Pipeline(Block):
         """
         self._names.clear()
 
+        sample_rate = (
+            self.first.sample_rate if self.first.sample_rate is not None else float(1)
+        )
+
         for idx, block in enumerate(self.blocks):
             if block.name is None:
                 continue
@@ -127,6 +167,9 @@ class Pipeline(Block):
                 raise ValueError(f"Duplicate block name: {block.name!r}")
 
             self._names[block.name] = idx
+
+            if idx > 0:
+                block._sample_rate = sample_rate * block.sample_rate_ratio
 
     def _resolve_block_index(self, key: str | int) -> int:
         """Resolve a block name or index to an integer index.

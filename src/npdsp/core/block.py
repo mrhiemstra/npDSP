@@ -64,6 +64,18 @@ class Block(ABC):
         """
         return False
 
+    @property
+    def sample_rate_ratio(self) -> float:
+        return 1
+
+    @property
+    def latency_samples(self) -> float | None:
+        return 0
+
+    @property
+    def sample_rate(self) -> float | None:
+        return self._sample_rate
+
     def reset(self) -> None:
         """Reset the internal state of the block.
 
@@ -141,6 +153,7 @@ class Block(ABC):
             Optional name used to identify the block within a pipeline.
         """
         self.name = name
+        self._sample_rate: float | None = None
 
     def __call__(self, x: SignalLike) -> Signal:
         """Process a signal by calling the block.
