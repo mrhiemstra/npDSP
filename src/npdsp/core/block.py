@@ -117,9 +117,9 @@ class Block(ABC):
         if reset:
             self.reset()
 
-        min_time = np.min(run_times)
-        mean_time = np.mean(run_times)
-        max_time = np.max(run_times)
+        min_time = float(np.min(run_times))
+        mean_time = float(np.mean(run_times))
+        max_time = float(np.max(run_times))
 
         results.append(
             ProfileResult(

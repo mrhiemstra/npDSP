@@ -113,17 +113,21 @@ def test_iir_a0_cannot_be_zero() -> None:
         )
 
 
-def test_iir_per_channel_b_and_a_must_match() -> None:
+def test_iir_per_channel_b_and_a_broadcast() -> None:
+    b = np.array([[0.2, 0.4, 0.2]])  # 1 row
+    a = np.array([[1.0, -0.5, 0.1], [1.0, -0.2, 0.1]])  # 2 channels
+    iir = IIR(b, a)
+    x = np.random.normal(size=(2, 100))
+
+    y = iir(x)
+    assert y.shape == (2, 100)
+
+
+def test_iir_per_channel_mismatch_raises() -> None:
+    b = np.array([[0.2, 0.4, 0.2], [0.1, 0.1, 0.1]])  # 2 rows
+    a = np.array([[1.0, -0.5, 0.1], [1.0, -0.2, 0.1], [1.0, -0.3, 0.1]])  # 3 channels
     with pytest.raises(ValueError):
-        IIR(
-            b=[
-                [1, 2],
-                [3, 4],
-            ],
-            a=[
-                [1, 2],
-            ],
-        )
+        IIR(b, a)
 
 
 # ---------------------------------------------------------------------------
@@ -409,21 +413,13 @@ def test_iir_per_channel_coefficients() -> None:
 
 
 def test_iir_wrong_number_of_per_channel_coefficients_raises() -> None:
-    iir = IIR(
-        b=[
-            [1, 2],
-            [3, 4],
-        ],
-        a=[1],
-    )
-
     with pytest.raises(ValueError):
-        iir(
-            [
-                [1, 2, 3],
-                [4, 5, 6],
-                [7, 8, 9],
-            ]
+        IIR(
+            b=[
+                [1, 2],
+                [3, 4],
+            ],
+            a=[1],
         )
 
 

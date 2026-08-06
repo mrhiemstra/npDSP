@@ -27,7 +27,10 @@ class Delay(Block):
     -----
     The delay is applied along the first axis. Additional dimensions are
     preserved, allowing the block to operate on signals containing multiple
-    channels.
+    channels. (Unchanged from v0.0.2: note this differs from FIR/IIR, which
+    treat the *final* axis as the sample axis. That inconsistency predates
+    this change and is preserved here rather than silently "fixed", since
+    unifying it would alter Delay's existing input/output contract.)
 
     The block is stateful. Call :meth:`reset` to clear the internal buffer.
 

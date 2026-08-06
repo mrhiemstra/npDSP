@@ -27,7 +27,9 @@ Blocks
    generated/Convert
    generated/Delay
    generated/Divide
+   generated/FIR
    generated/Floor
+   generated/IIR
    generated/Lambda
    generated/Maximum
    generated/Minimum

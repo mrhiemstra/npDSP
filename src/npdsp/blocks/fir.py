@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from ..core import Block, Signal, SignalLike
+from ..core import Block, Signal, SignalLike, SlidingBuffer
 
 
 class FIR(Block):
@@ -59,7 +59,17 @@ class FIR(Block):
         if self.coefs.ndim == 0:
             raise ValueError("FIR coefficients must be at least one-dimensional")
 
-        self._state: np.ndarray | None = None
+        taps = self.coefs.shape[-1]
+
+        # Coefficients are reversed once up front: convolution via
+        # sliding windows needs coefs applied in the *same* order as the
+        # window (oldest-to-newest), while FIR coefficients are conventionally
+        # given newest-tap-first. Caching this avoids re-deriving it per call
+        self._coefs_rev = self.coefs[..., ::-1]
+
+        self._history = SlidingBuffer(max(taps - 1, 0), axis=-1)
+        self._coefs_rev_bc: np.ndarray | None = None
+        self._dtype: np.dtype | None = None
 
     @property
     def stateful(self) -> bool:
@@ -68,7 +78,9 @@ class FIR(Block):
 
     def reset(self) -> None:
         """Reset the filter state."""
-        self._state = None
+        self._history.reset()
+        self._coefs_rev_bc = None
+        self._dtype = None
 
     def process(self, x: Signal) -> Signal:
         """Filter the input signal.
@@ -77,85 +89,33 @@ class FIR(Block):
         preserved between calls so that separately processed chunks produce
         the same result as processing the concatenated signal.
         """
-
         if x.ndim == 0:
             raise ValueError("FIR input must be at least one-dimensional")
 
         taps = self.coefs.shape[-1]
 
-        if self._state is None:
-            state_shape = np.broadcast_shapes(
-                x.shape[:-1],
-                self.coefs.shape[:-1],
-            )
-
-            self._state = np.zeros(
-                (*state_shape, max(taps - 1, 0)),
-                dtype=np.result_type(x, self.coefs),
-            )
-        else:
-            state_shape = self._state.shape[:-1]
-
-            if x.shape[:-1] != state_shape:
-                raise ValueError(
-                    "FIR input leading dimensions cannot change between calls: "
-                    f"expected {state_shape}, got {x.shape[:-1]}"
-                )
-
         if taps == 1:
-            y = x * self.coefs
+            # No history needed: a single-tap FIR is a pure elementwise gain.
+            return x * self.coefs
 
-            self._state = np.empty(
-                (*state_shape, 0),
-                dtype=np.result_type(x, self.coefs),
-            )
+        state_shape = np.broadcast_shapes(x.shape[:-1], self.coefs.shape[:-1])
 
-            return y
+        if self._dtype is None:
+            self._dtype = np.result_type(x, self.coefs)
+            self._coefs_rev_bc = np.broadcast_to(
+                self._coefs_rev.astype(self._dtype, copy=False),
+                (*state_shape, taps),
+            ).copy()
+        dtype = self._dtype
 
-        dtype = np.result_type(
-            x,
-            self.coefs,
-            self._state,
-        )
+        x = np.broadcast_to(x.astype(dtype, copy=False), (*state_shape, x.shape[-1]))
 
-        state = self._state.astype(dtype, copy=False)
-        x = x.astype(dtype, copy=False)
-        coefs = self.coefs.astype(dtype, copy=False)
+        self._history.prepare((*state_shape, taps - 1), dtype)
+        extended = self._history.extend(x)
 
-        state = np.broadcast_to(
-            state,
-            (*state_shape, taps - 1),
-        )
+        windows = np.lib.stride_tricks.sliding_window_view(extended, taps, axis=-1)
+        # windows shape: (*state_shape, x.shape[-1], taps); coefs_rev_bc shape: (*state_shape, taps)
+        assert self._coefs_rev_bc is not None
+        y = np.einsum("...t,...nt->...n", self._coefs_rev_bc, windows)
 
-        x = np.broadcast_to(
-            x,
-            (*state_shape, x.shape[-1]),
-        )
-
-        coefs = np.broadcast_to(
-            coefs,
-            (*state_shape, taps),
-        )
-
-        extended = np.concatenate(
-            [state, x],
-            axis=-1,
-        )
-
-        y = np.zeros_like(
-            x,
-            dtype=dtype,
-        )
-
-        for k in range(taps):
-            y += (
-                coefs[..., k, np.newaxis]
-                * extended[
-                    ...,
-                    taps - 1 - k : taps - 1 - k + x.shape[-1],
-                ]
-            )
-
-        self._state = extended[..., -(taps - 1) :].copy()
-
-        return y
+        return y.astype(dtype, copy=False)
