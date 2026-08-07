@@ -142,7 +142,7 @@ class Downsample(Block):
     @property
     def stateful(self) -> bool:
         return True
-    
+
     @property
     def sample_rate_ratio(self):
         return self.factor
