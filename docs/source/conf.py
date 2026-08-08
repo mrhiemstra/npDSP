@@ -27,6 +27,9 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
+    "sphinx.ext.duration",
+    "sphinx_last_updated_by_git",
+    "sphinx_prompt",
 ]
 
 autosummary_generate = True

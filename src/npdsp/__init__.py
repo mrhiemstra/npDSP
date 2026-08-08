@@ -34,4 +34,7 @@ __all__ = [
     "Subtract",
     "Tap",
     "Upsample",
+    "design",
+    "impulse_response",
+    "window",
 ]

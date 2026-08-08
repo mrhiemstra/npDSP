@@ -1,4 +1,5 @@
 from .conversion import Convert, Downsample, Upsample
+from .filters import design, impulse_response, window
 from .fir import FIR
 from .iir import IIR
 from .math import (
@@ -42,4 +43,7 @@ __all__ = [
     "Subtract",
     "Tap",
     "Upsample",
+    "design",
+    "impulse_response",
+    "window",
 ]

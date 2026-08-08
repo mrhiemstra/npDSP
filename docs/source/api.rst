@@ -27,6 +27,7 @@ Blocks
    generated/Convert
    generated/Delay
    generated/Divide
+   generated/Downsample
    generated/FIR
    generated/Floor
    generated/IIR
@@ -40,3 +41,7 @@ Blocks
    generated/ResetCounter
    generated/Subtract
    generated/Tap
+   generated/Upsample
+   generated/design
+   generated/impulse_response
+   generated/window

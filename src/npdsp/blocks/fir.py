@@ -80,6 +80,46 @@ class FIR(Block):
     def latency_samples(self) -> float:
         return (len(self.coefs) - 1) / 2
 
+    @property
+    def type(self) -> int | None:
+        """
+        Determine the type of FIR filter based on symmetry properties.
+
+        Type 1: Even order, symmetric (h[n] = h[N-1-n])
+        Type 2: Odd order, symmetric (h[n] = h[N-1-n])
+        Type 3: Even order, antisymmetric (h[n] = -h[N-1-n])
+        Type 4: Odd order, antisymmetric (h[n] = -h[N-1-n])
+
+        Parameters
+        ----------
+        h : ndarray
+            FIR filter coefficients.
+
+        Returns
+        -------
+        int
+            Filter type (1, 2, 3, or 4). Returns None if filter doesn't match any type.
+        """
+        N = len(self.coefs)
+        tol = 1e-10
+
+        # Check symmetry
+        is_symmetric = np.allclose(self.coefs, self._coefs_rev, atol=tol)
+        is_antisymmetric = np.allclose(self.coefs, -self._coefs_rev, atol=tol)
+
+        if not (is_symmetric or is_antisymmetric):
+            return None  # Not a linear-phase filter
+
+        # Determine order (even or odd)
+        # Even order = odd number of taps (N is odd)
+        # Odd order = even number of taps (N is even)
+        is_even_order = N % 2 == 1
+
+        if is_symmetric:
+            return 1 if is_even_order else 2
+        else:  # antisymmetric
+            return 3 if is_even_order else 4
+
     def reset(self) -> None:
         """Reset the filter state."""
         self._history.reset()

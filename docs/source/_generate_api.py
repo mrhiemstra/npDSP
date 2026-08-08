@@ -14,7 +14,10 @@ API = SOURCE / "api.rst"
 
 
 def get_submodule(obj: object) -> str:
-    module = getattr(obj, "__module__", "npdsp")
+    if inspect.ismodule(obj):
+        module = obj.__name__
+    else:
+        module = obj.__module__
 
     if module.startswith("npdsp."):
         module = module.removeprefix("npdsp.")
@@ -31,11 +34,8 @@ def get_category(obj: object) -> str:
     if module.startswith("blocks"):
         return "Blocks"
 
-    if module.startswith("math"):
-        return "Math"
-
-    if module.startswith("conversion"):
-        return "Conversion"
+    if module.startswith("npdsp"):
+        return "npdsp"
 
     return "Other"
 
@@ -50,6 +50,11 @@ def format_signature(obj: object) -> str:
 def generate_object_page(name: str, obj: object) -> None:
     path = GENERATED / f"{name}.rst"
 
+    if inspect.ismodule(obj):
+        class_name = obj.__name__
+    else:
+        class_name = f"npdsp.{name}"
+
     title = f"{name}"
     underline = "=" * len(title)
 
@@ -58,8 +63,7 @@ def generate_object_page(name: str, obj: object) -> None:
         underline,
         "",
         ".. currentmodule:: npdsp",
-        "",
-        f".. autoclass:: npdsp.{name}",
+        f".. {'automodule' if inspect.ismodule(obj) else 'autoclass'}:: {class_name}",
         "   :members:",
         "   :undoc-members:",
         "",
@@ -79,7 +83,9 @@ def generate() -> None:
     for name in npdsp.__all__:
         obj = getattr(npdsp, name)
 
-        if not (inspect.isclass(obj) or inspect.isfunction(obj)):
+        if not (
+            inspect.isclass(obj) or inspect.isfunction(obj) or inspect.ismodule(obj)
+        ):
             continue
 
         category = get_category(obj)
@@ -98,9 +104,6 @@ def generate() -> None:
     category_order = [
         "Core",
         "Blocks",
-        "Math",
-        "Conversion",
-        "Other",
     ]
 
     for category in category_order:
