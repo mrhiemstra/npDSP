@@ -84,7 +84,7 @@ class Lowpass(Pipeline):
             assert not isinstance(self._ft_or_n, float)
             return self._ft_or_n
 
-        num_coefs = np.ceil(4 / self.ft)
+        num_coefs = int(np.ceil(4 / self.ft))
 
         if not (num_coefs % 2) and not self.allow_even_n:
             num_coefs += 1
@@ -179,7 +179,7 @@ class Highpass(Pipeline):
             assert not isinstance(self._ft_or_n, float)
             return self._ft_or_n
 
-        num_coefs = np.ceil(4 / self.ft)
+        num_coefs = int(np.ceil(4 / self.ft))
 
         if not (num_coefs % 2) and not self.allow_even_n:
             num_coefs += 1
@@ -296,7 +296,7 @@ class Bandpass(Pipeline):
             assert not isinstance(self._ft_or_n, float)
             return self._ft_or_n
 
-        num_coefs = np.ceil(4 / self.ft)
+        num_coefs = int(np.ceil(4 / self.ft))
 
         if not (num_coefs % 2) and not self.allow_even_n:
             num_coefs += 1
@@ -407,7 +407,7 @@ class Bandstop(Pipeline):
             assert not isinstance(self._ft_or_n, float)
             return self._ft_or_n
 
-        num_coefs = np.ceil(4 / self.ft)
+        num_coefs = int(np.ceil(4 / self.ft))
 
         if not (num_coefs % 2) and not self.allow_even_n:
             num_coefs += 1

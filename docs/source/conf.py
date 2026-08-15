@@ -32,6 +32,7 @@ extensions = [
     "sphinx_prompt",
 ]
 
+autodoc_typehints = "description"
 autosummary_generate = True
 templates_path = ["_templates"]
 exclude_patterns = []
