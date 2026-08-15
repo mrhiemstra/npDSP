@@ -10,10 +10,7 @@ The core idea is simple: **build DSP as a pipeline of blocks** and connect them 
 import numpy as np
 import npdsp
 
-pipeline = (
-    npdsp.Add(1)
-    >> npdsp.Multiply(2)
-)
+pipeline = npdsp.Add(1) >> npdsp.Multiply(2)
 
 x = np.array([1, 2, 3])
 y = pipeline(x)
@@ -58,11 +55,7 @@ The fundamental building block in npDSP is the **processing block**.
 Blocks can be composed with `>>`:
 
 ```python
-pipeline = (
-    npdsp.Add(1)
-    >> npdsp.Multiply(2)
-    >> some_filter
-)
+pipeline = npdsp.Add(1) >> npdsp.Multiply(2) >> some_filter
 ```
 
 The resulting pipeline is callable:
@@ -82,12 +75,7 @@ Because filters are ordinary npDSP blocks, they can be combined directly with ma
 For example:
 
 ```python
-pipeline = (
-    preprocessing
-    >> fir_filter
-    >> iir_filter
-    >> postprocessing
-)
+pipeline = preprocessing >> fir_filter >> iir_filter >> postprocessing
 ```
 
 The FIR/IIR case is particularly useful for streaming because the filter's internal state can persist between successive calls.
@@ -179,10 +167,7 @@ Mathematical operations are also available as blocks.
 For example:
 
 ```python
-pipeline = (
-    npdsp.Add(1)
-    >> npdsp.Multiply(2)
-)
+pipeline = npdsp.Add(1) >> npdsp.Multiply(2)
 ```
 
 This allows simple mathematical transformations to be combined with filters and other DSP operations without leaving the pipeline abstraction.
@@ -212,10 +197,7 @@ This is especially important when a signal is split into chunks. Processing each
 Blocks can be given names:
 
 ```python
-pipeline = (
-    npdsp.Add(1, name="offset")
-    >> npdsp.Multiply(2, name="gain")
-)
+pipeline = npdsp.Add(1, name="offset") >> npdsp.Multiply(2, name="gain")
 ```
 
 Named blocks can then be accessed from the pipeline:
@@ -231,12 +213,7 @@ This can be useful when inspecting or working with larger processing chains.
 A complete streaming DSP application can be as simple as:
 
 ```python
-pipeline = (
-    preprocessing
-    >> fir_filter
-    >> iir_filter
-    >> postprocessing
-)
+pipeline = preprocessing >> fir_filter >> iir_filter >> postprocessing
 
 while True:
     samples = streaming_device.get_samples()

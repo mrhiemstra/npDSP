@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Callable
+
 import numba
 import numpy as np
-from collections.abc import Callable
 
 from ..core import Block, Signal, SignalLike
 
@@ -84,9 +85,7 @@ class FIR(Block):
         self._taps = taps
 
         # JIT-compiled function, compiled on first process() call
-        self._jitted_process: (
-           ProcessFn | None
-        ) = None
+        self._jitted_process: ProcessFn | None = None
 
     @property
     def stateful(self) -> bool:

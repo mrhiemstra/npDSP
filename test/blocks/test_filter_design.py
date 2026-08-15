@@ -97,7 +97,9 @@ def test_bandpass_matches_lowpass_difference() -> None:
     N = 5
 
     result = impulse_response.bandpass(f_low_norm, f_high_norm, N)
-    expected = impulse_response.lowpass(f_high_norm, N) - impulse_response.lowpass(f_low_norm, N)
+    expected = impulse_response.lowpass(f_high_norm, N) - impulse_response.lowpass(
+        f_low_norm, N
+    )
 
     assert np.allclose(result, expected)
 
@@ -108,7 +110,9 @@ def test_bandstop_matches_allpass_minus_bandpass() -> None:
     N = 5
 
     result = impulse_response.bandstop(f_low_norm, f_high_norm, N)
-    expected = impulse_response.ideal_allpass(N) - impulse_response.bandpass(f_low_norm, f_high_norm, N)
+    expected = impulse_response.ideal_allpass(N) - impulse_response.bandpass(
+        f_low_norm, f_high_norm, N
+    )
 
     assert np.allclose(result, expected)
 
