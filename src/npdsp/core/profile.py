@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class ProfileResult:
     """Timing results for a single profiled block.

@@ -37,8 +37,8 @@ Output
 
 .. code-block:: text
 
-   Add(name='offset', value=2) >> Multiply(name='gain', _sample_rate=1.0, value=0.5) >> Delay(name='delay', _sample_rate=1.0, samples=3, _history=<npdsp.core.buffer.SlidingBuffer object at 0x0000017DBEA8F230>)
-   Multiply(name='gain', _sample_rate=1.0, value=0.5)
+   Add(name='offset', value=2) >> Multiply(name='gain', value=0.5) >> Delay(name='delay', samples=3)
+   Multiply(name='gain', value=0.5)
    [0.  0.  0.  1.  1.5]
    [2 3 4 5 6]
    [1.  1.5 2.  2.5 3. ]

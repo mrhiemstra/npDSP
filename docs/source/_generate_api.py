@@ -166,7 +166,6 @@ def generate_examples() -> None:
         example_name = example_file.stem
         generated_example_file = GENERATED_EXAMPLES / f"{example_name}.rst"
 
-
         lines = [
             example_name,
             "=" * len(example_name),
@@ -175,9 +174,8 @@ def generate_examples() -> None:
             "",
             ".. code-block:: python",
             "   :linenos:",
-            "", 
+            "",
         ]
-
 
         with example_file.open("r", encoding="utf-8") as f:
             for line in f:
@@ -197,6 +195,7 @@ def generate_examples() -> None:
             capture_output=True,
             text=True,
             cwd=EXAMPLES_SOURCE,
+            check=True,
         ).stdout.splitlines()
 
         for line in result:
@@ -206,6 +205,7 @@ def generate_examples() -> None:
 
         with EXAMPLES.open("a", encoding="utf-8") as f:
             f.write(f"   generated/examples/{example_name}\n")
+
 
 def generate_getting_started() -> None:
     getting_started_file = SOURCE / "getting_started.rst"
@@ -217,6 +217,7 @@ def generate_getting_started() -> None:
         lines = f.readlines()
 
     getting_started_file.write_text("".join(lines), encoding="utf-8")
+
 
 if __name__ == "__main__":
     generate_api()
