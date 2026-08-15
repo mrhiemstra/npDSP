@@ -9,10 +9,10 @@ Core
 .. toctree::
    :maxdepth: 1
 
-   generated/Block
-   generated/Pipeline
-   generated/ProfileResult
-   generated/ProfileResults
+   generated/api/Block
+   generated/api/Pipeline
+   generated/api/ProfileResult
+   generated/api/ProfileResults
 
 Blocks
 ------
@@ -20,28 +20,28 @@ Blocks
 .. toctree::
    :maxdepth: 1
 
-   generated/Absolute
-   generated/Add
-   generated/Clip
-   generated/Conjugate
-   generated/Convert
-   generated/Delay
-   generated/Divide
-   generated/Downsample
-   generated/FIR
-   generated/Floor
-   generated/IIR
-   generated/Lambda
-   generated/Maximum
-   generated/Minimum
-   generated/Modulo
-   generated/Multiply
-   generated/Negate
-   generated/Power
-   generated/ResetCounter
-   generated/Subtract
-   generated/Tap
-   generated/Upsample
-   generated/design
-   generated/impulse_response
-   generated/window
+   generated/api/Absolute
+   generated/api/Add
+   generated/api/Clip
+   generated/api/Conjugate
+   generated/api/Convert
+   generated/api/Delay
+   generated/api/Divide
+   generated/api/Downsample
+   generated/api/FIR
+   generated/api/Floor
+   generated/api/IIR
+   generated/api/Lambda
+   generated/api/Maximum
+   generated/api/Minimum
+   generated/api/Modulo
+   generated/api/Multiply
+   generated/api/Negate
+   generated/api/Power
+   generated/api/ResetCounter
+   generated/api/Subtract
+   generated/api/Tap
+   generated/api/Upsample
+   generated/api/design
+   generated/api/impulse_response
+   generated/api/window

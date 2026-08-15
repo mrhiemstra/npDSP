@@ -139,6 +139,7 @@ class Block(ABC):
                 min_time=min_time,
                 mean_time=mean_time,
                 max_time=max_time,
+                runs=runs,
             )
         )
 
@@ -198,7 +199,9 @@ class Block(ABC):
             attributes.
         """
         args = ", ".join(
-            f"{k}={v!r}" for k, v in self.__dict__.items() if v is not None
+            f"{k}={v!r}"
+            for k, v in self.__dict__.items()
+            if v is not None and not k.startswith("_")
         )
         return f"{self.__class__.__name__}({args})"
 
