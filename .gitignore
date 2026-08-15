@@ -45,7 +45,6 @@ htmlcov/
 # =========================
 
 docs/build/
-docs/source/generated/
 
 # =========================
 # Jupyter

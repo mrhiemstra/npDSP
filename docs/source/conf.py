@@ -46,6 +46,8 @@ html_static_path = [""]
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from _generate_api import generate
+from _generate_api import generate_api, generate_examples, generate_getting_started
 
-generate()
+generate_api()
+generate_examples()
+generate_getting_started()

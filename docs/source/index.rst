@@ -14,4 +14,5 @@ A lightweight, composable DSP pipeline library built on NumPy.
 
    getting_started
    concepts
+   examples
    api

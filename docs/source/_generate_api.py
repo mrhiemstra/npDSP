@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import inspect
+import subprocess
+import sys
 from collections.abc import Callable
 from pathlib import Path
 from shutil import rmtree
@@ -10,7 +12,12 @@ import npdsp
 
 SOURCE = Path(__file__).parent
 GENERATED = SOURCE / "generated"
+GENERATED_API = GENERATED / "api"
+EXAMPLES_SOURCE = Path(__file__).parent.parent.parent / "examples"
+GENERATED_EXAMPLES = GENERATED / "examples"
+
 API = SOURCE / "api.rst"
+EXAMPLES = SOURCE / "examples.rst"
 
 
 def get_submodule(obj: object) -> str:
@@ -48,7 +55,7 @@ def format_signature(obj: object) -> str:
 
 
 def generate_object_page(name: str, obj: object) -> None:
-    path = GENERATED / f"{name}.rst"
+    path = GENERATED_API / f"{name}.rst"
 
     if inspect.ismodule(obj):
         class_name = obj.__name__
@@ -72,11 +79,11 @@ def generate_object_page(name: str, obj: object) -> None:
     path.write_text("\n".join(lines), encoding="utf-8")
 
 
-def generate() -> None:
-    if GENERATED.exists() and GENERATED.is_dir():
-        rmtree(GENERATED)
+def generate_api() -> None:
+    if GENERATED_API.exists() and GENERATED_API.is_dir():
+        rmtree(GENERATED_API)
 
-    GENERATED.mkdir(parents=True, exist_ok=False)
+    GENERATED_API.mkdir(parents=True, exist_ok=False)
 
     groups: dict[str, list[str]] = {}
 
@@ -124,12 +131,94 @@ def generate() -> None:
         )
 
         for name in sorted(names):
-            lines.append(f"   generated/{name}")
+            lines.append(f"   generated/api/{name}")
 
         lines.append("")
 
     API.write_text("\n".join(lines), encoding="utf-8")
 
 
+def generate_examples() -> None:
+    if GENERATED_EXAMPLES.exists() and GENERATED_EXAMPLES.is_dir():
+        rmtree(GENERATED_EXAMPLES)
+
+    GENERATED_EXAMPLES.mkdir(parents=True, exist_ok=False)
+
+    if EXAMPLES.exists() and EXAMPLES.is_file():
+        EXAMPLES.unlink()
+
+    # Create examples.rst
+    lines = [
+        "Examples",
+        "========",
+        "",
+        "The following examples demonstrate how to use npDSP.",
+        "",
+        ".. toctree::",
+        "   :maxdepth: 1",
+        "",
+        "",
+    ]
+
+    EXAMPLES.write_text("\n".join(lines), encoding="utf-8")
+
+    for example_file in EXAMPLES_SOURCE.glob("*.py"):
+        example_name = example_file.stem
+        generated_example_file = GENERATED_EXAMPLES / f"{example_name}.rst"
+
+
+        lines = [
+            example_name,
+            "=" * len(example_name),
+            "Code",
+            "----",
+            "",
+            ".. code-block:: python",
+            "   :linenos:",
+            "", 
+        ]
+
+
+        with example_file.open("r", encoding="utf-8") as f:
+            for line in f:
+                lines.append(f"   {line.rstrip()}")
+
+        lines += [
+            "",
+            "Output",
+            "------",
+            "",
+            ".. code-block:: text",
+            "",
+        ]
+
+        result = subprocess.run(
+            [sys.executable, str(example_file)],
+            capture_output=True,
+            text=True,
+            cwd=EXAMPLES_SOURCE,
+        ).stdout.splitlines()
+
+        for line in result:
+            lines.append(f"   {line.rstrip()}")
+
+        generated_example_file.write_text("\n".join(lines), encoding="utf-8")
+
+        with EXAMPLES.open("a", encoding="utf-8") as f:
+            f.write(f"   generated/examples/{example_name}\n")
+
+def generate_getting_started() -> None:
+    getting_started_file = SOURCE / "getting_started.rst"
+
+    if getting_started_file.exists() and getting_started_file.is_file():
+        getting_started_file.unlink()
+
+    with open(SOURCE.parent.parent / "README.rst", "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    getting_started_file.write_text("".join(lines), encoding="utf-8")
+
 if __name__ == "__main__":
-    generate()
+    generate_api()
+    generate_examples()
+    generate_getting_started()

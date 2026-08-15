@@ -301,6 +301,7 @@ class Pipeline(Block):
                     min_time=min_time,
                     mean_time=mean_time,
                     max_time=max_time,
+                    runs=runs,
                 )
             )
 

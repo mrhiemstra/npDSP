@@ -12,7 +12,7 @@ def main() -> None:
 
     x = np.random.randn(100_000)
 
-    results = pipeline.profile(x, runs=10)
+    results = pipeline.profile(x, runs=1_000)
 
     print(results)
 
