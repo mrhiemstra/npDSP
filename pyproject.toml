@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 
 [project]
-name = "npDSP"
+name = "npdsp"
 version = "0.0.5"
 requires-python = ">=3.10"
 description = "Composable NumPy-based digital signal processing blocks and pipelines"
