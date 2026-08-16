@@ -18,7 +18,7 @@ Code
            >> dsp.Delay(128, name="delay")
        )
    
-       x = np.random.randn(100_000)
+       x = np.random.Generator(np.random.PCG64()).standard_normal(100_000)
    
        results = pipeline.profile(x, runs=1_000)
    
@@ -35,6 +35,6 @@ Output
 
    name  | min_time|mean_time|  max_time|percent
    ------+---------+---------+----------+-------
-   offset|30.300 µs|33.757 µs|373.500 µs| 30.93%
-   gain  |30.300 µs|33.334 µs|342.800 µs| 30.54%
-   delay |34.000 µs|42.061 µs|464.500 µs| 38.53%
+   offset|31.200 µs|35.944 µs|407.300 µs| 30.62%
+   gain  |31.100 µs|35.795 µs|378.800 µs| 30.49%
+   delay |35.500 µs|45.664 µs|883.000 µs| 38.90%

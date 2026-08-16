@@ -1,3 +1,5 @@
+"""Profiling results for blocks in a pipeline."""
+
 from dataclasses import dataclass
 
 
@@ -19,6 +21,7 @@ class ProfileResult:
         seconds.
     runs : int
         Number of profiling runs performed.
+
     """
 
     name: str
@@ -28,6 +31,7 @@ class ProfileResult:
     runs: int  # Number of profiling runs
 
     def __repr__(self) -> str:
+        """Return a human-readable representation of the profiling result."""
         return f"{self.name}: {_time_to_si_string(self.mean_time)}"
 
     __str__ = __repr__
@@ -47,6 +51,7 @@ class ProfileResults(list[ProfileResult]):
             print(result.name, result.mean_time)
 
     The total mean execution time can be accessed through :attr:`tottime`.
+
     """
 
     @property
@@ -60,6 +65,7 @@ class ProfileResults(list[ProfileResult]):
         -------
         float
             Total mean execution time in seconds.
+
         """
         return sum((result.mean_time for result in self), 0.0)
 
@@ -74,16 +80,20 @@ class ProfileResults(list[ProfileResult]):
         -------
         str
             Formatted profiling results with SI-prefixed execution times.
+
         """
         max_name_length = max((len(result.name) for result in self), default=0)
         max_min_time_length = max(
-            (len(_time_to_si_string(result.mean_time)) for result in self), default=0
+            (len(_time_to_si_string(result.mean_time)) for result in self),
+            default=0,
         )
         max_mean_time_length = max(
-            (len(_time_to_si_string(result.mean_time)) for result in self), default=0
+            (len(_time_to_si_string(result.mean_time)) for result in self),
+            default=0,
         )
         max_max_time_length = max(
-            (len(_time_to_si_string(result.max_time)) for result in self), default=0
+            (len(_time_to_si_string(result.max_time)) for result in self),
+            default=0,
         )
         max_percent_length = max(
             max(
@@ -137,6 +147,7 @@ def _time_to_si_string(time: float) -> str:
     -------
     str
         Time formatted as a string with SI prefix.
+
     """
     match time:
         case time if time < 1e-9:

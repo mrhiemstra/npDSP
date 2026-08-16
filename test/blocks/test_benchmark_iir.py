@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
-from pytest_benchmark.fixture import BenchmarkFixture
 
 from npdsp import IIR
+
+if TYPE_CHECKING:
+    from pytest_benchmark.fixture import BenchmarkFixture
 
 RNG = np.random.default_rng(0)
 
@@ -33,7 +37,9 @@ def test_benchmark_iir_steady_state_channels(
 
 
 @pytest.mark.benchmark(group="iir-steady-state")
-@pytest.mark.parametrize("chunk_size", [1, 16, 256, 4096], ids=lambda s: f"chunk={s}")
+@pytest.mark.parametrize(
+    "chunk_size", [1, 16, 256, 4096], ids=lambda s: f"chunk={s}"
+)
 def test_benchmark_iir_steady_state_chunk_size(
     benchmark: BenchmarkFixture, chunk_size: int
 ) -> None:
@@ -56,7 +62,9 @@ def test_benchmark_iir_steady_state_order(
     benchmark: BenchmarkFixture, order: int
 ) -> None:
     """Steady-state scales with filter order."""
-    a = np.concatenate([[1.0], RNG.normal(scale=0.05, size=order)]).astype(np.float64)
+    a = np.concatenate([[1.0], RNG.normal(scale=0.05, size=order)]).astype(
+        np.float64
+    )
     b = RNG.normal(size=order + 1).astype(np.float64)
     iir = IIR(b, a)
     x = RNG.normal(size=(8, 4096)).astype(np.float64)

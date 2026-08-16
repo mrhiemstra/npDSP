@@ -3,12 +3,14 @@ from __future__ import annotations
 import inspect
 import subprocess
 import sys
-from collections.abc import Callable
 from pathlib import Path
 from shutil import rmtree
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 import npdsp
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 SOURCE = Path(__file__).parent
 GENERATED = SOURCE / "generated"
@@ -21,10 +23,7 @@ EXAMPLES = SOURCE / "examples.rst"
 
 
 def get_submodule(obj: object) -> str:
-    if inspect.ismodule(obj):
-        module = obj.__name__
-    else:
-        module = obj.__module__
+    module = obj.__name__ if inspect.ismodule(obj) else obj.__module__
 
     if module.startswith("npdsp."):
         module = module.removeprefix("npdsp.")
@@ -49,7 +48,7 @@ def get_category(obj: object) -> str:
 
 def format_signature(obj: object) -> str:
     try:
-        return str(inspect.signature(cast(Callable[..., object], obj)))
+        return str(inspect.signature(cast("Callable[..., object]", obj)))
     except (TypeError, ValueError):
         return ""
 
@@ -57,10 +56,7 @@ def format_signature(obj: object) -> str:
 def generate_object_page(name: str, obj: object) -> None:
     path = GENERATED_API / f"{name}.rst"
 
-    if inspect.ismodule(obj):
-        class_name = obj.__name__
-    else:
-        class_name = f"npdsp.{name}"
+    class_name = obj.__name__ if inspect.ismodule(obj) else f"npdsp.{name}"
 
     title = f"{name}"
     underline = "=" * len(title)
@@ -91,7 +87,9 @@ def generate_api() -> None:
         obj = getattr(npdsp, name)
 
         if not (
-            inspect.isclass(obj) or inspect.isfunction(obj) or inspect.ismodule(obj)
+            inspect.isclass(obj)
+            or inspect.isfunction(obj)
+            or inspect.ismodule(obj)
         ):
             continue
 
@@ -131,9 +129,9 @@ def generate_api() -> None:
         )
 
         for name in sorted(names):
-            lines.append(f"   generated/api/{name}")
+            lines.extend([f"   generated/api/{name}"])
 
-        lines.append("")
+        lines.extend([""])
 
     API.write_text("\n".join(lines), encoding="utf-8")
 
@@ -162,7 +160,7 @@ def generate_examples() -> None:
 
     EXAMPLES.write_text("\n".join(lines), encoding="utf-8")
 
-    for example_file in EXAMPLES_SOURCE.glob("*.py"):
+    for example_file in sorted(EXAMPLES_SOURCE.glob("*.py")):
         example_name = example_file.stem
         generated_example_file = GENERATED_EXAMPLES / f"{example_name}.rst"
 
@@ -213,7 +211,7 @@ def generate_getting_started() -> None:
     if getting_started_file.exists() and getting_started_file.is_file():
         getting_started_file.unlink()
 
-    with open(SOURCE.parent.parent / "README.rst", "r", encoding="utf-8") as f:
+    with Path.open(SOURCE.parent.parent / "README.rst", encoding="utf-8") as f:
         lines = f.readlines()
 
     getting_started_file.write_text("".join(lines), encoding="utf-8")

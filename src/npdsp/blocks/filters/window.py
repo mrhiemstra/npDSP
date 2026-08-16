@@ -13,7 +13,7 @@ They return:
 
 import numpy as np
 
-from ...core import Signal
+from npdsp.core import Signal
 
 
 class Window:
@@ -28,62 +28,69 @@ class Window:
     -------
     Signal
         Array of zeros of length N.
+
     """
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return a window of length N, base class returns zeros."""
         return np.zeros(N)
 
 
-class rectangular(Window):
+class Rectangular(Window):
     """Rectangular (boxcar) window: all ones."""
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return the rectangular window of length N."""
         return np.ones(N)
 
 
-class triangular(Window):
+class Triangular(Window):
     """Triangular (Bartlett) window.
 
     Produces a symmetric triangular shape with peak 1 at the center.
     """
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return the triangular window of length N."""
         n = np.arange(N) - (N - 1) / 2
-        w = 1 - np.abs(n) / ((N - 1) / 2)
-        return w
+        return 1 - np.abs(n) / ((N - 1) / 2)
 
 
-class hanning(Window):
+class Hanning(Window):
     """Hanning (raised cosine) window.
 
     Formula: w[n] = 0.5 + 0.5*cos(pi*n/N) with n centered about (N-1)/2.
     """
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return the Hanning window of length N."""
         n = np.arange(N) - (N - 1) / 2
-        w = 0.5 + 0.5 * np.cos(n * np.pi / N)
-        return w
+        return 0.5 + 0.5 * np.cos(n * np.pi / N)
 
 
-class hamming(Window):
+class Hamming(Window):
     """Hamming window.
 
     Formula: w[n] = 0.54 + 0.46*cos(pi*n/N) with n centered about (N-1)/2.
     """
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return the Hamming window of length N."""
         n = np.arange(N) - (N - 1) / 2
-        w = 0.54 + 0.46 * np.cos(n * np.pi / N)
-        return w
+        return 0.54 + 0.46 * np.cos(n * np.pi / N)
 
 
-class blackman(Window):
+class Blackman(Window):
     """Blackman window.
 
     Uses the common 0.42/0.5/0.08 coefficient form.
     """
 
-    def __new__(cls, N: int) -> Signal:
+    def __new__(cls, N: int) -> Signal:  # noqa: N803
+        """Return the Blackman window of length N."""
         n = np.arange(N) - (N - 1) / 2
-        w = 0.42 + 0.5 * np.cos(n * np.pi / N) + 0.08 * np.cos(2 * n * np.pi / N)
-        return w
+        return (
+            0.42
+            + 0.5 * np.cos(n * np.pi / N)
+            + 0.08 * np.cos(2 * n * np.pi / N)
+        )

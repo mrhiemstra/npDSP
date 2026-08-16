@@ -1,3 +1,5 @@
+"""Finite impulse response (FIR) filter block for signal processing pipelines."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -5,7 +7,7 @@ from collections.abc import Callable
 import numba
 import numpy as np
 
-from ..core import Block, Signal, SignalLike
+from npdsp.core import Block, Signal, SignalLike
 
 ProcessFn = Callable[[Signal, Signal, Signal], Signal]
 
@@ -53,6 +55,7 @@ class FIR(Block):
                 [4, 5, 6],
             ]
         )
+
     """
 
     def __init__(
@@ -60,6 +63,7 @@ class FIR(Block):
         coefs: SignalLike,
         name: str | None = None,
     ) -> None:
+        """Initialize an FIR filter."""
         super().__init__(name=name)
 
         self.coefs = np.asarray(coefs)
@@ -68,7 +72,9 @@ class FIR(Block):
             raise ValueError("FIR coefficients cannot be empty")
 
         if self.coefs.ndim == 0:
-            raise ValueError("FIR coefficients must be at least one-dimensional")
+            raise ValueError(
+                "FIR coefficients must be at least one-dimensional"
+            )
 
         taps = self.coefs.shape[-1]
 
@@ -94,12 +100,12 @@ class FIR(Block):
 
     @property
     def latency_samples(self) -> float:
+        """Return the latency of the FIR filter in samples."""
         return (self._taps - 1) / 2
 
     @property
     def type(self) -> int | None:
-        """
-        Determine the type of FIR filter based on symmetry properties.
+        """Determine the type of FIR filter based on symmetry properties.
 
         Type 1: Even order, symmetric (h[n] = h[N-1-n])
         Type 2: Odd order, symmetric (h[n] = h[N-1-n])
@@ -110,8 +116,9 @@ class FIR(Block):
         -------
         int
             Filter type (1, 2, 3, or 4). Returns None if filter doesn't match any type.
+
         """
-        N = len(self.coefs)
+        n = len(self.coefs)
         tol = 1e-10
 
         # Check symmetry
@@ -124,12 +131,12 @@ class FIR(Block):
         # Determine order (even or odd)
         # Even order = odd number of taps (N is odd)
         # Odd order = even number of taps (N is even)
-        is_even_order = N % 2 == 1
+        is_even_order = n % 2 == 1
 
         if is_symmetric:
             return 1 if is_even_order else 2
-        else:  # antisymmetric
-            return 3 if is_even_order else 4
+        # antisymmetric
+        return 3 if is_even_order else 4
 
     def reset(self) -> None:
         """Clear all retained filter state."""
@@ -157,6 +164,7 @@ class FIR(Block):
         -------
         ndarray
             Filtered output, same shape as input.
+
         """
         x = np.asarray(x)
 
@@ -239,24 +247,29 @@ class FIR(Block):
     @staticmethod
     def _make_jitted_process(
         taps: int,
-        dtype: np.dtype,
+        dtype: np.dtype,  # noqa: ARG004
     ) -> ProcessFn:
         """Create tap-specific JIT-compiled process function."""
-
         if taps == 1:
 
             @numba.njit
-            def jit_taps1(x_work: Signal, coefs: Signal, state: Signal) -> Signal:
+            def jit_taps1(
+                x_work: Signal,
+                coefs: Signal,
+                state: Signal,  # noqa: ARG001
+            ) -> Signal:
                 y = np.empty_like(x_work)
                 y[:, :] = coefs[:, 0:1] * x_work
                 return y
 
             return jit_taps1
 
-        elif taps == 2:
+        if taps == 2:
 
             @numba.njit
-            def jit_taps2(x_work: Signal, coefs: Signal, state: Signal) -> Signal:
+            def jit_taps2(
+                x_work: Signal, coefs: Signal, state: Signal
+            ) -> Signal:
                 channels, n_samples = x_work.shape
                 y = np.empty_like(x_work)
                 for c in range(channels):
@@ -271,28 +284,28 @@ class FIR(Block):
 
             return jit_taps2
 
-        else:  # taps > 2
+        # taps > 2
 
-            @numba.njit
-            def jit_taps_general(
-                x_work: Signal, coefs: Signal, state: Signal
-            ) -> Signal:
-                channels, n_samples = x_work.shape
-                taps_val = coefs.shape[1]
-                y = np.empty_like(x_work)
+        @numba.njit
+        def jit_taps_general(
+            x_work: Signal, coefs: Signal, state: Signal
+        ) -> Signal:
+            channels, n_samples = x_work.shape
+            taps_val = coefs.shape[1]
+            y = np.empty_like(x_work)
 
-                for c in range(channels):
-                    for n in range(n_samples):
-                        xn = x_work[c, n]
-                        yn = coefs[c, 0] * xn
-                        for k in range(1, taps_val):
-                            yn += coefs[c, k] * state[c, taps_val - k - 1]
-                        y[c, n] = yn
+            for c in range(channels):
+                for n in range(n_samples):
+                    xn = x_work[c, n]
+                    yn = coefs[c, 0] * xn
+                    for k in range(1, taps_val):
+                        yn += coefs[c, k] * state[c, taps_val - k - 1]
+                    y[c, n] = yn
 
-                        for i in range(taps_val - 2):
-                            state[c, i] = state[c, i + 1]
-                        state[c, taps_val - 2] = xn
+                    for i in range(taps_val - 2):
+                        state[c, i] = state[c, i + 1]
+                    state[c, taps_val - 2] = xn
 
-                return y
+            return y
 
-            return jit_taps_general
+        return jit_taps_general

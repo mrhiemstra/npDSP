@@ -79,20 +79,20 @@ def test_downsample_stream(downsample: Downsample) -> None:
         np.array([5]),
     )
 
-    assert downsample._offset == 3  # pyright: ignore[reportPrivateUsage]
+    assert downsample._offset == 3  # pyright: ignore[reportPrivateUsage] # noqa: SLF001
 
 
 def test_downsample_reset(downsample: Downsample) -> None:
-    assert downsample._offset == 0  # pyright: ignore[reportPrivateUsage]
+    assert downsample._offset == 0  # pyright: ignore[reportPrivateUsage] # noqa: SLF001
 
     x = np.array([1, 2, 3])
     _ = downsample(x)
 
-    assert downsample._offset == 1  # pyright: ignore[reportPrivateUsage]
+    assert downsample._offset == 1  # pyright: ignore[reportPrivateUsage] # noqa: SLF001
 
     downsample.reset()
 
-    assert downsample._offset == 0  # pyright: ignore[reportPrivateUsage]
+    assert downsample._offset == 0  # pyright: ignore[reportPrivateUsage] # noqa: SLF001
 
 
 def test_upsample_single_conversion(upsample: Upsample) -> None:

@@ -1,6 +1,8 @@
+"""Delay block for signal processing pipelines."""
+
 from __future__ import annotations
 
-from ..core import Block, Signal, SlidingBuffer
+from npdsp.core import Block, Signal, SlidingBuffer
 
 
 class Delay(Block):
@@ -44,6 +46,7 @@ class Delay(Block):
         >>> delay = Delay(0)
         >>> delay([1, 2, 3])
         array([1, 2, 3])
+
     """
 
     def __init__(self, samples: int, name: str | None = None):
@@ -61,6 +64,7 @@ class Delay(Block):
         ------
         ValueError
             If ``samples`` is negative.
+
         """
         super().__init__(name=name)
 
@@ -90,6 +94,7 @@ class Delay(Block):
         Signal
             Input signal delayed by ``self.samples`` samples. Samples for
             which no previous input exists are filled with zeros.
+
         """
         if self.samples == 0:
             return x

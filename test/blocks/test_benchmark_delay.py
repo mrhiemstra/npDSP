@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 import pytest
-from pytest_benchmark.fixture import BenchmarkFixture
 
 from npdsp import Delay
+
+if TYPE_CHECKING:
+    from pytest_benchmark.fixture import BenchmarkFixture
 
 RNG = np.random.default_rng(0)
 
@@ -28,7 +32,9 @@ def test_benchmark_delay_length_scaling(
 
 
 @pytest.mark.benchmark(max_time=0.2, warmup=True, group="delay-streaming")
-def test_benchmark_delay_streaming_tiny_chunks(benchmark: BenchmarkFixture) -> None:
+def test_benchmark_delay_streaming_tiny_chunks(
+    benchmark: BenchmarkFixture,
+) -> None:
     """Many 1-sample calls through a moderately long delay line.
 
     Stresses the concatenate-per-call allocation pattern directly: each

@@ -1,9 +1,11 @@
+"""Infinite impulse response (IIR) filter block for signal processing pipelines."""
+
 from collections.abc import Callable
 
 import numba
 import numpy as np
 
-from ..core import Block, Signal, SignalLike
+from npdsp.core import Block, Signal, SignalLike
 
 
 class IIR(Block):
@@ -48,6 +50,7 @@ class IIR(Block):
     --------
     >>> iir = IIR([0.2, 0.4, 0.2], [1.0, -0.5, 0.1])
     >>> y = iir(x)  # First call compiles, subsequent calls are fast
+
     """
 
     def __init__(
@@ -56,6 +59,7 @@ class IIR(Block):
         a: SignalLike,
         name: str | None = None,
     ) -> None:
+        """Initialize an IIR filter block."""
         super().__init__(name=name)
 
         self.b = np.asarray(b)
@@ -144,6 +148,7 @@ class IIR(Block):
 
     @property
     def latency_samples(self) -> None:
+        """IIR filters have no fixed latency; return None."""
         return None
 
     def reset(self) -> None:
@@ -172,6 +177,7 @@ class IIR(Block):
         -------
         ndarray
             Filtered output, same shape as input.
+
         """
         x = np.asarray(x)
 
@@ -228,26 +234,27 @@ class IIR(Block):
         assert self._input_state is not None
         assert self._output_state is not None
 
-        y = self._jitted_process(x_work, b, a, self._input_state, self._output_state)
+        y = self._jitted_process(
+            x_work, b, a, self._input_state, self._output_state
+        )
 
         return y[0] if one_dimensional else y.reshape(x.shape)
 
     @staticmethod
     def _make_jitted_process(
         order: int,
-        dtype: np.dtype,
+        dtype: np.dtype,  # noqa: ARG004
     ) -> Callable[[Signal, Signal, Signal, Signal, Signal], Signal]:
         """Create order-specific JIT-compiled process function."""
-
         if order == 0:
 
             @numba.njit
             def jit_order0(
                 x_work: Signal,
                 b: Signal,
-                a: Signal,
-                input_state: Signal,
-                output_state: Signal,
+                a: Signal,  # noqa: ARG001
+                input_state: Signal,  # noqa: ARG001
+                output_state: Signal,  # noqa: ARG001
             ) -> Signal:
                 #  channels, n_samples = x_work.shape
                 y = np.empty_like(x_work)
@@ -256,7 +263,7 @@ class IIR(Block):
 
             return jit_order0
 
-        elif order == 1:
+        if order == 1:
 
             @numba.njit
             def jit_order1(
@@ -283,36 +290,36 @@ class IIR(Block):
 
             return jit_order1
 
-        else:  # order > 1
+        # order > 1
 
-            @numba.njit
-            def jit_general(
-                x_work: Signal,
-                b: Signal,
-                a: Signal,
-                input_state: Signal,
-                output_state: Signal,
-            ) -> Signal:
-                channels, n_samples = x_work.shape
-                order_val = input_state.shape[1]
-                y = np.empty_like(x_work)
-                for c in range(channels):
-                    for n in range(n_samples):
-                        xn = x_work[c, n]
-                        yn = b[c, 0] * xn + input_state[c, 0]
-                        y[c, n] = yn
-                        for i in range(order_val - 1):
-                            input_state[c, i] = (
-                                b[c, i + 1] * xn
-                                - a[c, i + 1] * yn
-                                + input_state[c, i + 1]
-                            )
-                        input_state[c, order_val - 1] = (
-                            b[c, order_val] * xn - a[c, order_val] * yn
+        @numba.njit
+        def jit_general(
+            x_work: Signal,
+            b: Signal,
+            a: Signal,
+            input_state: Signal,
+            output_state: Signal,
+        ) -> Signal:
+            channels, n_samples = x_work.shape
+            order_val = input_state.shape[1]
+            y = np.empty_like(x_work)
+            for c in range(channels):
+                for n in range(n_samples):
+                    xn = x_work[c, n]
+                    yn = b[c, 0] * xn + input_state[c, 0]
+                    y[c, n] = yn
+                    for i in range(order_val - 1):
+                        input_state[c, i] = (
+                            b[c, i + 1] * xn
+                            - a[c, i + 1] * yn
+                            + input_state[c, i + 1]
                         )
-                        for i in range(order_val - 1):
-                            output_state[c, i] = output_state[c, i + 1]
-                        output_state[c, order_val - 1] = yn
-                return y
+                    input_state[c, order_val - 1] = (
+                        b[c, order_val] * xn - a[c, order_val] * yn
+                    )
+                    for i in range(order_val - 1):
+                        output_state[c, i] = output_state[c, i + 1]
+                    output_state[c, order_val - 1] = yn
+            return y
 
-            return jit_general
+        return jit_general

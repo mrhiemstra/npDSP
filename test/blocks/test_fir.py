@@ -67,12 +67,14 @@ def test_fir_is_stateful(
 
 
 def test_fir_scalar_coefficients_raise() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="FIR coefficients must be at least one-dimensional"
+    ):
         FIR(1)
 
 
 def test_fir_empty_coefficients_raise() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="FIR coefficients cannot be empty"):
         FIR([])
 
 
@@ -231,7 +233,9 @@ def test_fir_preserves_sample_length(
 def test_fir_scalar_input_raises(
     fir1: FIR,
 ) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError, match="FIR input must be at least one-dimensional"
+    ):
         fir1(1)
 
 
@@ -408,7 +412,10 @@ def test_fir_per_channel_coefficients_must_match_input_channels() -> None:
         ]
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=r"Coefficient channel count \(3\) does not match input \(2\)",
+    ):
         fir(
             [
                 [1, 2, 3],
@@ -608,7 +615,7 @@ def test_fir_leading_shape_cannot_change() -> None:
         ]
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input channel count changed"):
         fir(
             [
                 [1, 2, 3],
@@ -621,7 +628,7 @@ def test_fir_higher_dimension_leading_shape_cannot_change() -> None:
 
     fir(np.zeros((2, 4, 10)))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input channel count changed"):
         fir(np.zeros((2, 3, 10)))
 
 
@@ -630,7 +637,7 @@ def test_fir_leading_shape_established_by_first_call() -> None:
 
     fir(np.zeros((2, 3)))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input channel count changed"):
         fir(np.zeros((3, 3)))
 
 

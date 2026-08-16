@@ -1,3 +1,5 @@
+"""Blocks for npdsp."""
+
 from .conversion import Convert, Downsample, Upsample
 from .filters import design, impulse_response, window
 from .fir import FIR
