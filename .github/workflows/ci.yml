@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
       - run: uv lock --check
 
@@ -26,6 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: lock_file
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
@@ -39,6 +49,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: lock_file
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
@@ -52,6 +67,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: lock_file
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Install dependencies
@@ -82,6 +102,11 @@ jobs:
             python-version: "3.12"
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Set up Python
@@ -103,6 +128,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Set up Python
@@ -119,6 +149,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: test
     steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          
       - uses: ./.github/actions/setup
 
       - name: Build package
