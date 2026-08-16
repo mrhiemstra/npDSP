@@ -140,7 +140,7 @@ def test_delay_reset() -> None:
 
 
 def test_delay_negative_samples() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="samples must be non-negative"):
         Delay(-1)
 
 

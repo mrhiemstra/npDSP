@@ -15,7 +15,7 @@ def test_window_returns_zeros() -> None:
 
 
 def test_rectangular_window_returns_ones() -> None:
-    result = window.rectangular(4)
+    result = window.Rectangular(4)
 
     assert np.array_equal(result, np.ones(4))
 
@@ -24,7 +24,7 @@ def test_triangular_window_matches_expected_values() -> None:
     n = np.arange(5) - (5 - 1) / 2
     expected = 1 - np.abs(n) / ((5 - 1) / 2)
 
-    result = window.triangular(5)
+    result = window.Triangular(5)
 
     assert np.allclose(result, expected)
 
@@ -33,7 +33,7 @@ def test_hanning_window_matches_expected_values() -> None:
     n = np.arange(5) - (5 - 1) / 2
     expected = 0.5 + 0.5 * np.cos(n * np.pi / 5)
 
-    result = window.hanning(5)
+    result = window.Hanning(5)
 
     assert np.allclose(result, expected)
 
@@ -42,16 +42,18 @@ def test_hamming_window_matches_expected_values() -> None:
     n = np.arange(5) - (5 - 1) / 2
     expected = 0.54 + 0.46 * np.cos(n * np.pi / 5)
 
-    result = window.hamming(5)
+    result = window.Hamming(5)
 
     assert np.allclose(result, expected)
 
 
 def test_blackman_window_matches_expected_values() -> None:
     n = np.arange(5) - (5 - 1) / 2
-    expected = 0.42 + 0.5 * np.cos(n * np.pi / 5) + 0.08 * np.cos(2 * n * np.pi / 5)
+    expected = (
+        0.42 + 0.5 * np.cos(n * np.pi / 5) + 0.08 * np.cos(2 * n * np.pi / 5)
+    )
 
-    result = window.blackman(5)
+    result = window.Blackman(5)
 
     assert np.allclose(result, expected)
 
@@ -86,7 +88,9 @@ def test_highpass_matches_allpass_minus_lowpass() -> None:
     N = 5
 
     result = impulse_response.highpass(fc_norm, N)
-    expected = impulse_response.ideal_allpass(N) - impulse_response.lowpass(fc_norm, N)
+    expected = impulse_response.ideal_allpass(N) - impulse_response.lowpass(
+        fc_norm, N
+    )
 
     assert np.allclose(result, expected)
 
@@ -97,9 +101,9 @@ def test_bandpass_matches_lowpass_difference() -> None:
     N = 5
 
     result = impulse_response.bandpass(f_low_norm, f_high_norm, N)
-    expected = impulse_response.lowpass(f_high_norm, N) - impulse_response.lowpass(
-        f_low_norm, N
-    )
+    expected = impulse_response.lowpass(
+        f_high_norm, N
+    ) - impulse_response.lowpass(f_low_norm, N)
 
     assert np.allclose(result, expected)
 
@@ -127,7 +131,7 @@ def test_lowpass_design_uses_window_and_normalizes_coefficients() -> None:
         fc=0.1,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="lowpass",
     )
 
@@ -147,7 +151,7 @@ def test_lowpass_design_can_use_fixed_coefficient_length() -> None:
         fc=0.1,
         ft_or_n=9,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         use_fixed_coef_len=True,
         name="fixed_lowpass",
     )
@@ -162,7 +166,7 @@ def test_lowpass_design_can_allow_even_num_coefs() -> None:
         fc=0.1,
         ft_or_n=0.25,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         allow_even_n=True,
     )
 
@@ -174,7 +178,7 @@ def test_highpass_design_normalizes_response() -> None:
         fc=0.1,
         ft_or_n=0.2,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="highpass",
     )
 
@@ -191,7 +195,7 @@ def test_bandpass_design_uses_requested_cutoffs() -> None:
         fc2=0.2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="bandpass",
     )
 
@@ -209,7 +213,7 @@ def test_bandstop_design_normalizes_sum() -> None:
         fc2=0.2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="bandstop",
     )
 

@@ -1,6 +1,8 @@
+"""Utility blocks for signal processing pipelines."""
+
 from collections.abc import Callable
 
-from ..core import Block, Signal
+from npdsp.core import Block, Signal
 
 
 class Lambda(Block):
@@ -13,6 +15,7 @@ class Lambda(Block):
         signal.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(
@@ -26,6 +29,7 @@ class Lambda(Block):
             Function to apply to each input signal.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name)
         self.func = func
@@ -42,6 +46,7 @@ class Lambda(Block):
         -------
         Signal
             Signal returned by ``self.func``.
+
         """
         return self.func(x)
 
@@ -60,6 +65,7 @@ class ResetCounter(Block):
     Notes
     -----
     This block is primarily useful for testing and verifying reset behavior.
+
     """
 
     def __init__(self, name: str | None = None) -> None:
@@ -69,6 +75,7 @@ class ResetCounter(Block):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name)
         self.reset_count = 0
@@ -85,6 +92,7 @@ class ResetCounter(Block):
         -------
         Signal
             The unchanged input signal.
+
         """
         return x
 
@@ -104,6 +112,7 @@ class Tap(Block):
     ----------
     name : str
         Name used to identify the tap within a pipeline.
+
     """
 
     def __init__(self, name: str) -> None:
@@ -113,6 +122,7 @@ class Tap(Block):
         ----------
         name : str
             Name used to identify the tap within a pipeline.
+
         """
         super().__init__(name)
 
@@ -128,6 +138,7 @@ class Tap(Block):
         -------
         Signal
             The unchanged input signal.
+
         """
         return x
 
@@ -143,6 +154,7 @@ class Copy(Block):
     ----------
     name : str
         Name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str) -> None:
@@ -152,6 +164,7 @@ class Copy(Block):
         ----------
         name : str
             Name used to identify the block within a pipeline.
+
         """
         super().__init__(name)
 
@@ -167,5 +180,6 @@ class Copy(Block):
         -------
         Signal
             Copy of the input signal.
+
         """
         return x.copy()

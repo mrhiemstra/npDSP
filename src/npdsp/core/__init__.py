@@ -1,3 +1,5 @@
+"""Core classes for npDSP."""
+
 from .block import Block
 from .buffer import SlidingBuffer
 from .pipeline import Pipeline

@@ -1,0 +1,43 @@
+target-version = "py310"
+line-length = 80
+extend-exclude = [".git", ".venv", "build", "dist"]
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # Pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "PTH", # flake8-use-pathlib
+    "ARG", # flake8-unused-arguments
+    "TC",  # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "SIM", # flake8-simplify
+    "SLF", # flake8-self
+    "RET", # flake8-return
+    "PT",  # flake8-pytest
+    "T20", # flake8-print
+    "PIE", # flake8-pie
+    "D",   # pydocstyle
+    #"DOC",    # pydoclint
+    "PERF", # Perflint
+    "N",    # pep8-naming
+    "NPY",  # NumPy
+]
+ignore = ["E501", "F403", "F405", "D203", "D213"]
+
+[lint.per-file-ignores]
+"test/**/*.py" = ["D", "N"]
+"examples/**/*.py" = ["D", "T201"]
+
+[lint.isort]
+known-first-party = ["npdsp"]
+
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+skip-magic-trailing-comma = false

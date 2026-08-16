@@ -1,3 +1,5 @@
+"""Base class for all npDSP processing blocks."""
+
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
@@ -7,10 +9,10 @@ from typing import TYPE_CHECKING
 import numpy as np
 
 from .profile import ProfileResult, ProfileResults
-from .typing import Signal, SignalLike
 
 if TYPE_CHECKING:
     from .pipeline import Pipeline
+    from .typing import Signal, SignalLike
 
 
 class Block(ABC):
@@ -29,6 +31,7 @@ class Block(ABC):
     Subclasses must implement :meth:`process`. Blocks are stateless by
     default, but subclasses can override :attr:`stateful` and :meth:`reset`
     when they maintain state between calls.
+
     """
 
     @abstractmethod
@@ -49,6 +52,7 @@ class Block(ABC):
         ------
         NotImplementedError
             Raised if a subclass does not implement this method.
+
         """
         raise NotImplementedError
 
@@ -61,19 +65,23 @@ class Block(ABC):
         bool
             ``False`` by default. Stateful blocks should override this
             property and return ``True``.
+
         """
         return False
 
     @property
     def sample_rate_ratio(self) -> float:
+        """Return the ratio of output sample rate to input sample rate."""
         return 1
 
     @property
     def latency_samples(self) -> float | None:
+        """Return the total latency of the block in samples."""
         return 0
 
     @property
     def sample_rate(self) -> float | None:
+        """Return the effective sample rate of the block."""
         return self._sample_rate
 
     def reset(self) -> None:
@@ -83,8 +91,11 @@ class Block(ABC):
         Stateful subclasses should override this method to restore their
         initial state.
         """
+        return
 
-    def profile(self, x: Signal, runs: int = 1, reset: bool = False) -> ProfileResults:
+    def profile(
+        self, x: Signal, runs: int = 1, reset: bool = False
+    ) -> ProfileResults:
         """Profile the execution time of the block.
 
         The block is executed one or more times and the minimum, mean, and
@@ -110,6 +121,7 @@ class Block(ABC):
         The output of each run is passed as the input to the next run.
         Therefore, for stateful blocks, successive runs may operate on
         different inputs or internal states.
+
         """
         results = ProfileResults()
 
@@ -152,6 +164,7 @@ class Block(ABC):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         self.name = name
         self._sample_rate: float | None = None
@@ -169,6 +182,7 @@ class Block(ABC):
         -------
         Signal
             Processed output signal.
+
         """
         return self.process(np.asarray(x))
 
@@ -184,6 +198,7 @@ class Block(ABC):
         -------
         Pipeline
             Pipeline containing this block followed by ``other``.
+
         """
         from .pipeline import Pipeline
 
@@ -197,6 +212,7 @@ class Block(ABC):
         str
             Class name followed by the block's non-``None`` instance
             attributes.
+
         """
         args = ", ".join(
             f"{k}={v!r}"
@@ -214,5 +230,6 @@ class Block(ABC):
         -------
         int
             Always returns ``1`` for a single block.
+
         """
         return 1

@@ -4,8 +4,9 @@ from collections.abc import Callable
 
 import numpy as np
 
-from ...core import Pipeline, Signal
-from ..fir import FIR
+from npdsp.blocks.fir import FIR
+from npdsp.core import Pipeline, Signal
+
 from . import impulse_response
 
 
@@ -32,6 +33,7 @@ class Lowpass(Pipeline):
         Optional pipeline name.
     allow_even_n : bool, optional
         Allow an even number of coefficients when True.
+
     """
 
     def __init__(
@@ -44,6 +46,7 @@ class Lowpass(Pipeline):
         name: str | None = None,
         allow_even_n: bool = False,
     ) -> None:
+        """Initialize a lowpass FIR filter block."""
         self._fc = fc
         self._ft_or_n = ft_or_n
         self._f_norm = f_norm
@@ -60,22 +63,20 @@ class Lowpass(Pipeline):
         """Cutoff frequency after normalization if necessary."""
         if self._f_norm:
             return self._fc
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc / self.fir.sample_rate
-        else:
-            return self._fc
+        return self._fc
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
         if self._use_fixed_coef_len:
             return None
-        elif self._f_norm:
+        if self._f_norm:
             return self._ft_or_n
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._ft_or_n / self.fir.sample_rate
-        else:
-            return self._ft_or_n
+        return self._ft_or_n
 
     @property
     def num_coefs(self) -> int:
@@ -94,7 +95,7 @@ class Lowpass(Pipeline):
     @property
     def coefs(self) -> Signal:
         """Compute the FIR coefficients using the selected window and response."""
-        N = self.num_coefs
+        N = self.num_coefs  # noqa: N806
         w = self.window(N)
         ir = impulse_response.lowpass(self.fc, N)
 
@@ -127,6 +128,7 @@ class Highpass(Pipeline):
         Optional pipeline name.
     allow_even_n : bool, optional
         Allow an even number of coefficients when True.
+
     """
 
     def __init__(
@@ -139,6 +141,7 @@ class Highpass(Pipeline):
         name: str | None = None,
         allow_even_n: bool = False,
     ) -> None:
+        """Initialize a highpass FIR filter block."""
         self._fc = fc
         self._ft_or_n = ft_or_n
         self._f_norm = f_norm
@@ -155,22 +158,20 @@ class Highpass(Pipeline):
         """Highpass cutoff frequency after normalization if necessary."""
         if self._f_norm:
             return self._fc
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc / self.fir.sample_rate
-        else:
-            return self._fc
+        return self._fc
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
         if self._use_fixed_coef_len:
             return None
-        elif self._f_norm:
+        if self._f_norm:
             return self._ft_or_n
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._ft_or_n / self.fir.sample_rate
-        else:
-            return self._ft_or_n
+        return self._ft_or_n
 
     @property
     def num_coefs(self) -> int:
@@ -189,16 +190,13 @@ class Highpass(Pipeline):
     @property
     def coefs(self) -> Signal:
         """Compute the highpass filter coefficients."""
-        N = self.num_coefs
+        N = self.num_coefs  # noqa: N806
         w = self.window(N)
         ir = impulse_response.highpass(self.fc, N)
 
         c = w * ir
 
-        if (N % 2) == 1:
-            mag_idx = -1
-        else:
-            mag_idx = int(N * (0.5 + self.fc) / 2)
+        mag_idx = -1 if N % 2 == 1 else int(N * (0.5 + self.fc) / 2)
 
         c /= np.abs(np.fft.rfft(c)[mag_idx])
 
@@ -232,6 +230,7 @@ class Bandpass(Pipeline):
         Optional pipeline name.
     allow_even_n : bool, optional
         Allow an even number of coefficients when True.
+
     """
 
     def __init__(
@@ -245,6 +244,7 @@ class Bandpass(Pipeline):
         name: str | None = None,
         allow_even_n: bool = False,
     ) -> None:
+        """Initialize a bandpass FIR filter block."""
         self._fc1 = fc1
         self._fc2 = fc2
         self._ft_or_n = ft_or_n
@@ -262,32 +262,29 @@ class Bandpass(Pipeline):
         """Lower band edge frequency after normalization if needed."""
         if self._f_norm:
             return self._fc1
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc1 / self.fir.sample_rate
-        else:
-            return self._fc1
+        return self._fc1
 
     @property
     def fc2(self) -> float:
         """Upper band edge frequency after normalization if needed."""
         if self._f_norm:
             return self._fc2
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc2 / self.fir.sample_rate
-        else:
-            return self._fc2
+        return self._fc2
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
         if self._use_fixed_coef_len:
             return None
-        elif self._f_norm:
+        if self._f_norm:
             return self._ft_or_n
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._ft_or_n / self.fir.sample_rate
-        else:
-            return self._ft_or_n
+        return self._ft_or_n
 
     @property
     def num_coefs(self) -> int:
@@ -306,7 +303,7 @@ class Bandpass(Pipeline):
     @property
     def coefs(self) -> Signal:
         """Compute the bandpass filter coefficients."""
-        N = self.num_coefs
+        N = self.num_coefs  # noqa: N806
         w = self.window(N)
         ir = impulse_response.bandpass(self.fc1, self.fc2, N)
 
@@ -343,6 +340,7 @@ class Bandstop(Pipeline):
         Optional pipeline name.
     allow_even_n : bool, optional
         Allow an even number of coefficients when True.
+
     """
 
     def __init__(
@@ -356,6 +354,7 @@ class Bandstop(Pipeline):
         name: str | None = None,
         allow_even_n: bool = False,
     ) -> None:
+        """Initialize a bandstop FIR filter block."""
         self._fc1 = fc1
         self._fc2 = fc2
         self._ft_or_n = ft_or_n
@@ -373,32 +372,29 @@ class Bandstop(Pipeline):
         """Lower stopband frequency after normalization if needed."""
         if self._f_norm:
             return self._fc1
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc1 / self.fir.sample_rate
-        else:
-            return self._fc1
+        return self._fc1
 
     @property
     def fc2(self) -> float:
         """Upper stopband frequency after normalization if needed."""
         if self._f_norm:
             return self._fc2
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._fc2 / self.fir.sample_rate
-        else:
-            return self._fc2
+        return self._fc2
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
         if self._use_fixed_coef_len:
             return None
-        elif self._f_norm:
+        if self._f_norm:
             return self._ft_or_n
-        elif self.fir.sample_rate is not None:
+        if self.fir.sample_rate is not None:
             return self._ft_or_n / self.fir.sample_rate
-        else:
-            return self._ft_or_n
+        return self._ft_or_n
 
     @property
     def num_coefs(self) -> int:
@@ -417,7 +413,7 @@ class Bandstop(Pipeline):
     @property
     def coefs(self) -> Signal:
         """Compute the bandstop filter coefficients."""
-        N = self.num_coefs
+        N = self.num_coefs  # noqa: N806
         w = self.window(N)
         ir = impulse_response.bandstop(self.fc1, self.fc2, N)
 

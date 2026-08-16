@@ -10,7 +10,7 @@ def main() -> None:
         >> dsp.Delay(128, name="delay")
     )
 
-    x = np.random.randn(100_000)
+    x = np.random.Generator(np.random.PCG64()).standard_normal(100_000)
 
     results = pipeline.profile(x, runs=1_000)
 

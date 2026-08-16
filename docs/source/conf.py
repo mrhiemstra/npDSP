@@ -1,4 +1,4 @@
-# Configuration file for the Sphinx documentation builder.
+# Configuration file for the Sphinx documentation builder. # noqa: D100
 #
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
@@ -6,6 +6,19 @@ import sys
 from pathlib import Path
 
 import npdsp
+
+sys.path.insert(0, str(Path(__file__).parent))
+
+from _generate_api import (
+    generate_api,
+    generate_examples,
+    generate_getting_started,
+)
+
+generate_api()
+generate_examples()
+generate_getting_started()
+
 
 # Make src/ available so Sphinx can import npdsp.
 ROOT = Path(__file__).resolve().parents[2]
@@ -43,11 +56,3 @@ exclude_patterns = []
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = [""]
-
-sys.path.insert(0, str(Path(__file__).parent))
-
-from _generate_api import generate_api, generate_examples, generate_getting_started
-
-generate_api()
-generate_examples()
-generate_getting_started()

@@ -1,3 +1,5 @@
+"""npdsp: A Python library for digital signal processing."""
+
 from importlib.metadata import version
 
 from .blocks import *

@@ -96,7 +96,7 @@ def test_irshift_pipeline(
 
 
 def test_duplicate_names_raise() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Duplicate block name: 'same'"):
         Pipeline(
             Tap("same"),
             Tap("same"),

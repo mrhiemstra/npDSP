@@ -16,13 +16,13 @@ def test_lowpass_generation_matches_windowed_sinc_and_normalizes() -> None:
         fc=fc,
         ft_or_n=ft,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="lp_test",
     )
 
     # Manual computation of expected coefficients: window * ideal lowpass, then normalize
     N = block.num_coefs
-    w = window.rectangular(N)
+    w = window.Rectangular(N)
     ir = impulse_response.lowpass(block.fc, N)
     expected = w * ir
     expected = expected / np.sum(expected)
@@ -40,7 +40,7 @@ def test_lowpass_num_coefs_calculation_and_oddness() -> None:
         fc=0.1,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
     )
 
     assert block.ft == 0.1
@@ -55,7 +55,7 @@ def test_highpass_normalizes_response_magnitude() -> None:
         fc=fc,
         ft_or_n=0.2,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="hp_test",
     )
 
@@ -63,10 +63,7 @@ def test_highpass_normalizes_response_magnitude() -> None:
     c = block.coefs
 
     # Determine the index the implementation uses for magnitude normalization
-    if (N % 2) == 1:
-        mag_idx = -1
-    else:
-        mag_idx = int(N * (0.5 + block.fc) / 2)
+    mag_idx = -1 if N % 2 == 1 else int(N * (0.5 + block.fc) / 2)
 
     # The chosen FFT bin magnitude should be normalized to 1.0
     fft_vals = np.fft.rfft(c)
@@ -81,7 +78,7 @@ def test_bandpass_normalizes_at_center_frequency() -> None:
         fc2=fc2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="bp_test",
     )
 
@@ -103,12 +100,12 @@ def test_bandstop_generation_matches_windowed_ir_and_normalizes_sum() -> None:
         fc2=fc2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
         name="bs_test",
     )
 
     N = block.num_coefs
-    w = window.rectangular(N)
+    w = window.Rectangular(N)
     ir = impulse_response.bandstop(block.fc1, block.fc2, N)
     expected = w * ir
     expected = expected / np.sum(expected)
@@ -138,7 +135,7 @@ def test_lowpass_frequency_behavior() -> None:
         fc=0.1,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
     )
 
     pass_mag = _mag_at(block.coefs, 0.05)
@@ -154,7 +151,7 @@ def test_highpass_frequency_behavior() -> None:
         fc=0.1,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
     )
 
     low_mag = _mag_at(block.coefs, 0.05)
@@ -175,7 +172,7 @@ def test_bandpass_frequency_behavior() -> None:
         fc2=fc2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
     )
 
     center_mag = _mag_at(block.coefs, center)
@@ -198,7 +195,7 @@ def test_bandstop_frequency_behavior() -> None:
         fc2=fc2,
         ft_or_n=0.1,
         f_norm=True,
-        window=window.rectangular,
+        window=window.Rectangular,
     )
 
     center_mag = _mag_at(block.coefs, center)
@@ -223,8 +220,12 @@ def test_num_coefs_is_computed_from_ft_formula_and_is_monotonic() -> None:
             num += 1
         return num
 
-    b1 = design.Lowpass(fc=0.1, ft_or_n=ft1, f_norm=True, window=window.rectangular)
-    b2 = design.Lowpass(fc=0.1, ft_or_n=ft2, f_norm=True, window=window.rectangular)
+    b1 = design.Lowpass(
+        fc=0.1, ft_or_n=ft1, f_norm=True, window=window.Rectangular
+    )
+    b2 = design.Lowpass(
+        fc=0.1, ft_or_n=ft2, f_norm=True, window=window.Rectangular
+    )
 
     assert b1.num_coefs == expected_num_coefs(ft1)
     assert b2.num_coefs == expected_num_coefs(ft2)
@@ -238,10 +239,10 @@ def test_ft_reducing_makes_transition_sharper() -> None:
     ft_large = 0.2
 
     b_small = design.Lowpass(
-        fc=fc, ft_or_n=ft_small, f_norm=True, window=window.rectangular
+        fc=fc, ft_or_n=ft_small, f_norm=True, window=window.Rectangular
     )
     b_large = design.Lowpass(
-        fc=fc, ft_or_n=ft_large, f_norm=True, window=window.rectangular
+        fc=fc, ft_or_n=ft_large, f_norm=True, window=window.Rectangular
     )
 
     # Test at a frequency slightly above the cutoff where the difference should be visible
@@ -257,11 +258,11 @@ def test_ft_reducing_makes_transition_sharper() -> None:
 @pytest.mark.parametrize(
     "window_fn",
     [
-        window.rectangular,
-        window.triangular,
-        window.hanning,
-        window.hamming,
-        window.blackman,
+        window.Rectangular,
+        window.Triangular,
+        window.Hanning,
+        window.Hamming,
+        window.Blackman,
     ],
 )
 def test_corner_frequency_matches_3db_within_transition_width(
@@ -291,15 +292,16 @@ def test_corner_frequency_matches_3db_within_transition_width(
             cross_idx = i
             break
 
-    assert cross_idx is not None, f"No -3dB crossing found for lowpass with {window_fn}"
+    assert cross_idx is not None, (
+        f"No -3dB crossing found for lowpass with {window_fn}"
+    )
 
     # Linear interpolation between bins to estimate crossing frequency
     y1, y2 = H_low[cross_idx - 1], H_low[cross_idx]
     f1, f2 = freqs[cross_idx - 1], freqs[cross_idx]
-    if y2 == y1:
-        f3db_low = f1
-    else:
-        f3db_low = f1 + (target_low - y1) * (f2 - f1) / (y2 - y1)
+    f3db_low = (
+        f1 if y2 == y1 else f1 + (target_low - y1) * (f2 - f1) / (y2 - y1)
+    )
 
     assert abs(f3db_low - fc) <= ft / 2
 
@@ -320,9 +322,8 @@ def test_corner_frequency_matches_3db_within_transition_width(
 
     y1, y2 = H_high[cross_idx], H_high[cross_idx + 1]
     f1, f2 = freqs[cross_idx], freqs[cross_idx + 1]
-    if y2 == y1:
-        f3db_high = f2
-    else:
-        f3db_high = f1 + (target_high - y1) * (f2 - f1) / (y2 - y1)
+    f3db_high = (
+        f2 if y2 == y1 else f1 + (target_high - y1) * (f2 - f1) / (y2 - y1)
+    )
 
     assert abs(f3db_high - fc) <= ft / 2

@@ -1,8 +1,13 @@
+"""Shared fixed-length trailing-history buffer for streaming blocks."""
+
 from __future__ import annotations
+
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from .typing import Signal
+if TYPE_CHECKING:
+    from .typing import Signal
 
 
 class SlidingBuffer:
@@ -27,9 +32,11 @@ class SlidingBuffer:
     math. A true zero-allocation ring buffer would require abandoning that
     vectorization in favor of per-sample writes (as IIR now does for its
     recursive part).
+
     """
 
     def __init__(self, size: int, axis: int = -1) -> None:
+        """Initialize the buffer."""
         if size < 0:
             raise ValueError("size must be non-negative")
 
@@ -63,6 +70,7 @@ class SlidingBuffer:
         ValueError
             If the leading (non-sample) dimensions differ from those used
             to initialize the buffer.
+
         """
         leading_shape = self._leading_shape_of(shape)
 
@@ -71,7 +79,9 @@ class SlidingBuffer:
 
             buffer_shape = list(leading_shape)
             insert_pos = (
-                self.axis if self.axis >= 0 else len(buffer_shape) + 1 + self.axis
+                self.axis
+                if self.axis >= 0
+                else len(buffer_shape) + 1 + self.axis
             )
             buffer_shape.insert(insert_pos, self.size)
 
@@ -100,16 +110,18 @@ class SlidingBuffer:
         -------
         numpy.ndarray
             ``history`` concatenated with ``x`` along ``self.axis``.
+
         """
         assert self._buffer is not None
 
         combined = np.concatenate((self._buffer, x), axis=self.axis)
 
         moved = np.moveaxis(combined, self.axis, -1)
-        if self.size > 0:
-            trimmed = moved[..., -self.size :].copy()
-        else:
-            trimmed = moved[..., 0:0].copy()
+        trimmed = (
+            moved[..., -self.size :].copy()
+            if self.size > 0
+            else moved[..., 0:0].copy()
+        )
         self._buffer = np.moveaxis(trimmed, -1, self.axis)
 
         return combined

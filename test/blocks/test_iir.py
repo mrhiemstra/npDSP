@@ -76,17 +76,17 @@ def test_iir_accepts_per_channel_coefficients() -> None:
 
 
 def test_iir_empty_b_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="b cannot be empty"):
         IIR([], [1])
 
 
 def test_iir_empty_a_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="a cannot be empty"):
         IIR([1], [])
 
 
 def test_iir_b_must_be_one_or_two_dimensional() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="b must be one- or two-dimensional"):
         IIR(
             [
                 [[1, 2]],
@@ -96,7 +96,7 @@ def test_iir_b_must_be_one_or_two_dimensional() -> None:
 
 
 def test_iir_a_must_be_one_or_two_dimensional() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="a must be one- or two-dimensional"):
         IIR(
             [1],
             [
@@ -106,7 +106,7 @@ def test_iir_a_must_be_one_or_two_dimensional() -> None:
 
 
 def test_iir_a0_cannot_be_zero() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r"a\[0\] must be non-zero"):
         IIR(
             [1, 2],
             [0, 1],
@@ -117,7 +117,7 @@ def test_iir_per_channel_b_and_a_broadcast() -> None:
     b = np.array([[0.2, 0.4, 0.2]])  # 1 row
     a = np.array([[1.0, -0.5, 0.1], [1.0, -0.2, 0.1]])  # 2 channels
     iir = IIR(b, a)
-    x = np.random.normal(size=(2, 100))
+    x = np.random.Generator(np.random.PCG64()).normal(size=(2, 100))
 
     y = iir(x)
     assert y.shape == (2, 100)
@@ -125,8 +125,13 @@ def test_iir_per_channel_b_and_a_broadcast() -> None:
 
 def test_iir_per_channel_mismatch_raises() -> None:
     b = np.array([[0.2, 0.4, 0.2], [0.1, 0.1, 0.1]])  # 2 rows
-    a = np.array([[1.0, -0.5, 0.1], [1.0, -0.2, 0.1], [1.0, -0.3, 0.1]])  # 3 channels
-    with pytest.raises(ValueError):
+    a = np.array(
+        [[1.0, -0.5, 0.1], [1.0, -0.2, 0.1], [1.0, -0.3, 0.1]]
+    )  # 3 channels
+    with pytest.raises(
+        ValueError,
+        match=r"b has 2 channels but a has 3 channels; must match or one must have exactly 1 row for broadcasting",
+    ):
         IIR(b, a)
 
 
@@ -413,7 +418,10 @@ def test_iir_per_channel_coefficients() -> None:
 
 
 def test_iir_wrong_number_of_per_channel_coefficients_raises() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=r"b is 2D \(per-channel\) but a is 1D \(shared\); both must be 1D or both must be 2D with matching channel counts",
+    ):
         IIR(
             b=[
                 [1, 2],
@@ -591,7 +599,7 @@ def test_iir_multichannel_leading_shape_cannot_change() -> None:
         ]
     )
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input channel count changed"):
         iir(
             [
                 [1, 2, 3],
@@ -628,7 +636,7 @@ def test_iir_higher_dimensional_leading_shape_cannot_change() -> None:
 
     iir(np.zeros((2, 3, 4)))
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Input channel count changed"):
         iir(np.zeros((2, 4, 4)))
 
 

@@ -1,7 +1,9 @@
+"""Conversion blocks for npdsp."""
+
 import numpy as np
 import numpy.typing as npt
 
-from ..core import Block, Signal
+from npdsp.core import Block, Signal
 
 
 class Convert(Block):
@@ -25,6 +27,7 @@ class Convert(Block):
     >>> block = Convert(np.float32)
     >>> block([1, 2, 3]).dtype
     dtype('float32')
+
     """
 
     def __init__(self, dtype: npt.DTypeLike, name: str | None = None):
@@ -36,6 +39,7 @@ class Convert(Block):
             NumPy data type to convert the signal to.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.dtype = np.dtype(dtype)
@@ -52,6 +56,7 @@ class Convert(Block):
         -------
         Signal
             Signal converted to ``self.dtype``.
+
         """
         return x.astype(self.dtype, copy=False)
 
@@ -71,6 +76,7 @@ class Upsample(Block):
     >>> block = Upsample(2)
     >>> block([1, 2, 3, 4])
     [1,0,2,0,3,0,4,0]
+
     """
 
     def __init__(self, factor: int, name: str | None = None):
@@ -82,12 +88,14 @@ class Upsample(Block):
             Factor to upsample the input signal with.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.factor = factor
 
     @property
     def sample_rate_ratio(self):
+        """Return the sample rate ratio of the upsample block."""
         return self.factor
 
     def process(self, x: Signal) -> Signal:
@@ -102,6 +110,7 @@ class Upsample(Block):
         -------
         Signal
             Signal upsampled with ``self.factor``.
+
         """
         y = np.zeros((*x.shape[:-1], x.shape[-1] * self.factor))
         y[..., :: self.factor] = x
@@ -123,6 +132,7 @@ class Downsample(Block):
     >>> block = Downsample(2)
     >>> block([1, 2, 3, 4])
     [1,3]
+
     """
 
     def __init__(self, factor: int, name: str | None = None):
@@ -134,6 +144,7 @@ class Downsample(Block):
             Factor to downsample the input signal with.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.factor = factor
@@ -141,13 +152,16 @@ class Downsample(Block):
 
     @property
     def stateful(self) -> bool:
+        """Whether the block maintains state between calls."""
         return True
 
     @property
     def sample_rate_ratio(self):
+        """Return the sample rate ratio of the downsample block."""
         return self.factor
 
     def reset(self) -> None:
+        """Reset the downsample block's internal state."""
         self._offset = 0
 
     def process(self, x: Signal) -> Signal:
@@ -162,6 +176,7 @@ class Downsample(Block):
         -------
         Signal
             Signal downsampled with ``self.factor``.
+
         """
         y = x[..., self._offset :: self.factor]
 

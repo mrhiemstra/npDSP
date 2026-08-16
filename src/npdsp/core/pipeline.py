@@ -1,15 +1,21 @@
+"""Pipeline of DSP blocks."""
+
 from __future__ import annotations
 
-from collections.abc import Iterator
 from time import perf_counter
-from types import EllipsisType
+from typing import TYPE_CHECKING
 
 import numpy as np
 from typing_extensions import Self
 
 from .block import Block
 from .profile import ProfileResult, ProfileResults
-from .typing import Signal
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+    from types import EllipsisType
+
+    from .typing import Signal
 
 
 class Pipeline(Block):
@@ -49,9 +55,12 @@ class Pipeline(Block):
     A slice can be made inclusive by appending an ellipsis::
 
         pipeline["first":"last", ...]
+
     """
 
-    def __init__(self, *blocks: Block | Pipeline, name: str | None = None) -> None:
+    def __init__(
+        self, *blocks: Block | Pipeline, name: str | None = None
+    ) -> None:
         """Initialize a pipeline.
 
         Parameters
@@ -89,6 +98,7 @@ class Pipeline(Block):
         ------
         IndexError
             Raised if the pipeline contains no blocks.
+
         """
         return self.blocks[0]
 
@@ -105,11 +115,13 @@ class Pipeline(Block):
         ------
         IndexError
             Raised if the pipeline contains no blocks.
+
         """
         return self.blocks[-1]
 
     @property
     def sample_rate(self) -> float:
+        """Return the effective sample rate of the pipeline."""
         rate = 1
 
         for block in self.blocks:
@@ -119,19 +131,26 @@ class Pipeline(Block):
 
     @property
     def latency_samples(self) -> float | None:
+        """Return the total latency of the pipeline in samples."""
         latency: float = 0
 
         for block in self.blocks:
-            latency += block.latency_samples if block.latency_samples is not None else 0
+            latency += (
+                block.latency_samples
+                if block.latency_samples is not None
+                else 0
+            )
 
         return latency
 
     @property
     def has_frequency_dependent_latency(self) -> bool:
+        """Return whether any block in the pipeline has frequency-dependent latency."""
         return any(block.latency_samples is None for block in self.blocks)
 
     @property
     def latency(self) -> float:
+        """Return the total latency of the pipeline in seconds."""
         if self.has_frequency_dependent_latency:
             raise NotImplementedError(
                 "Frequency dependent latency reporting is not yet implemented"
@@ -143,21 +162,22 @@ class Pipeline(Block):
         return self.latency_samples / self.first.sample_rate
 
     def _reindex(self) -> None:
-        """Rebuild the mapping between block names and their indices,
-        and the sample rate calculations
+        """Rebuild the mapping between block names and their indices, and the sample rate calculations.
 
-        Unnamed blocks are ignored. Block names must be unique within the
-        pipeline.
+        Unnamed blocks are ignored. Block names must be unique within the pipeline.
 
         Raises
         ------
         ValueError
             Raised if multiple blocks have the same name.
+
         """
         self._names.clear()
 
         sample_rate = (
-            self.first.sample_rate if self.first.sample_rate is not None else float(1)
+            self.first.sample_rate
+            if self.first.sample_rate is not None
+            else float(1)
         )
 
         for idx, block in enumerate(self.blocks):
@@ -169,7 +189,7 @@ class Pipeline(Block):
             self._names[block.name] = idx
 
             if idx > 0:
-                block._sample_rate = sample_rate * block.sample_rate_ratio
+                block._sample_rate = sample_rate * block.sample_rate_ratio  # pyright: ignore[reportPrivateUsage] # noqa: SLF001
 
     def _resolve_block_index(self, key: str | int) -> int:
         """Resolve a block name or index to an integer index.
@@ -188,6 +208,7 @@ class Pipeline(Block):
         ------
         KeyError
             Raised when ``key`` is a string that does not match a named block.
+
         """
         if isinstance(key, str):
             try:
@@ -210,6 +231,7 @@ class Pipeline(Block):
         -------
         int or None
             Resolved index, or ``None`` when the boundary is open-ended.
+
         """
         if key is None:
             return None
@@ -228,6 +250,7 @@ class Pipeline(Block):
         -------
         Signal
             Signal produced by the final block in the pipeline.
+
         """
         for block in self.blocks:
             x = block(x)
@@ -243,9 +266,11 @@ class Pipeline(Block):
         for block in self.blocks:
             block.reset()
             if block.stateful:
-                print(f"Reset stateful block {block}")
+                pass
 
-    def profile(self, x: Signal, runs: int = 1, reset: bool = False) -> ProfileResults:
+    def profile(
+        self, x: Signal, runs: int = 1, reset: bool = False
+    ) -> ProfileResults:
         """Profile the execution time of each block in the pipeline.
 
         Each block is executed ``runs`` times and its minimum, mean, and
@@ -270,6 +295,7 @@ class Pipeline(Block):
         The output of each block becomes the input to the next block.
         Repeated profiling runs of an individual block use the same input
         produced by the preceding block.
+
         """
         results = ProfileResults()
 
@@ -329,6 +355,7 @@ class Pipeline(Block):
         -------
         Block or None
             First matching block, or ``None`` if no matching block exists.
+
         """
         for block in self.blocks:
             if isinstance(block, cls):
@@ -348,14 +375,9 @@ class Pipeline(Block):
         -------
         list of Block
             All blocks matching the requested class, in pipeline order.
+
         """
-        instances: list[Block] = []
-
-        for block in self.blocks:
-            if isinstance(block, cls):
-                instances.append(block)
-
-        return instances
+        return [block for block in self.blocks if isinstance(block, cls)]
 
     def insert(self, key: int | str, block: Block) -> None:
         """Insert a block before the block at the specified position.
@@ -367,6 +389,7 @@ class Pipeline(Block):
             inserted.
         block : Block
             Block to insert.
+
         """
         self.blocks.insert(self._resolve_block_index(key), block)
         self._reindex()
@@ -378,6 +401,7 @@ class Pipeline(Block):
         ----------
         key : int or str
             Index or name of the block to remove.
+
         """
         del self.blocks[self._resolve_block_index(key)]
         self._reindex()
@@ -391,6 +415,7 @@ class Pipeline(Block):
             Index or name of the block to replace.
         block : Block
             Replacement block.
+
         """
         self.blocks[self._resolve_block_index(key)] = block
         self._reindex()
@@ -404,6 +429,7 @@ class Pipeline(Block):
             Index or name of the block to replace.
         block : Block
             Replacement block.
+
         """
         self.replace(key, block)
 
@@ -414,6 +440,7 @@ class Pipeline(Block):
         ----------
         key : int or str
             Index or name of the block to remove.
+
         """
         self.remove(key)
 
@@ -430,11 +457,12 @@ class Pipeline(Block):
         bool
             ``True`` if the block or name exists in the pipeline,
             otherwise ``False``.
+
         """
         if isinstance(item, str):
             return item in self._names
-        else:  # Block
-            return item in self.blocks
+        # Block
+        return item in self.blocks
 
     def __rshift__(self, other: Pipeline | Block) -> Pipeline:
         """Append a block or pipeline and return a new pipeline.
@@ -448,6 +476,7 @@ class Pipeline(Block):
         -------
         Pipeline
             New pipeline containing the blocks from both operands.
+
         """
         if isinstance(other, Pipeline):
             return Pipeline(*self.blocks, *other.blocks)
@@ -465,6 +494,7 @@ class Pipeline(Block):
         -------
         Self
             This pipeline after the blocks have been appended.
+
         """
         if isinstance(other, Pipeline):
             self.blocks.extend(other.blocks)
@@ -507,6 +537,7 @@ class Pipeline(Block):
             key followed by ``...``.
         NotImplementedError
             Raised when a slice step is provided.
+
         """
         inclusive_stop = False
         if isinstance(key, tuple):
@@ -520,20 +551,20 @@ class Pipeline(Block):
         if isinstance(key, str):
             return self.blocks[self._names[key]]
 
-        elif isinstance(key, int):
+        if isinstance(key, int):
             return self.blocks[key]
 
-        else:  # Slice
-            if key.step is not None:
-                raise NotImplementedError("Slice steps are not implemented")
+        # Slice
+        if key.step is not None:
+            raise NotImplementedError("Slice steps are not implemented")
 
-            start = self._resolve_slice_index(key.start)
-            stop = self._resolve_slice_index(key.stop)
+        start = self._resolve_slice_index(key.start)
+        stop = self._resolve_slice_index(key.stop)
 
-            if stop is not None and inclusive_stop:
-                stop += 1
+        if stop is not None and inclusive_stop:
+            stop += 1
 
-            return Pipeline(*self.blocks[start:stop])
+        return Pipeline(*self.blocks[start:stop])
 
     def __repr__(self) -> str:
         """Return a string representation of the pipeline.
@@ -542,6 +573,7 @@ class Pipeline(Block):
         -------
         str
             Pipeline blocks joined using the ``>>`` operator notation.
+
         """
         return " >> ".join(map(str, self.blocks))
 
@@ -554,6 +586,7 @@ class Pipeline(Block):
         -------
         int
             Number of blocks contained in the pipeline.
+
         """
         return len(self.blocks)
 
@@ -564,5 +597,6 @@ class Pipeline(Block):
         -------
         Iterator[Block]
             Iterator yielding blocks in pipeline order.
+
         """
         return iter(self.blocks)

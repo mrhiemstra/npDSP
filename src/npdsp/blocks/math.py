@@ -1,6 +1,8 @@
+"""Mathematical operations for signal processing pipelines."""
+
 import numpy as np
 
-from ..core import Block, Signal, SignalLike
+from npdsp.core import Block, Signal, SignalLike
 
 
 class Add(Block):
@@ -12,6 +14,7 @@ class Add(Block):
         Value or array to add to the input signal.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -23,6 +26,7 @@ class Add(Block):
             Value or array to add to the input signal.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -40,6 +44,7 @@ class Add(Block):
         Signal
             Signal with ``self.value`` added element-wise using NumPy
             broadcasting rules.
+
         """
         return x + self.value
 
@@ -53,6 +58,7 @@ class Subtract(Block):
         Value or array to subtract from the input signal.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -64,6 +70,7 @@ class Subtract(Block):
             Value or array to subtract from the input signal.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -81,6 +88,7 @@ class Subtract(Block):
         Signal
             Signal with ``self.value`` subtracted element-wise using NumPy
             broadcasting rules.
+
         """
         return x - self.value
 
@@ -94,6 +102,7 @@ class Multiply(Block):
         Value or array to multiply the input signal by.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -105,6 +114,7 @@ class Multiply(Block):
             Value or array to multiply the input signal by.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -122,6 +132,7 @@ class Multiply(Block):
         Signal
             Signal multiplied element-wise by ``self.value`` using NumPy
             broadcasting rules.
+
         """
         return x * self.value
 
@@ -141,6 +152,7 @@ class Divide(Block):
     ------
     ZeroDivisionError
         If ``value`` contains zero.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -157,6 +169,7 @@ class Divide(Block):
         ------
         ZeroDivisionError
             If ``value`` contains zero.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -177,6 +190,7 @@ class Divide(Block):
         Signal
             Signal divided element-wise by ``self.value`` using NumPy
             broadcasting rules.
+
         """
         return x / self.value
 
@@ -196,6 +210,7 @@ class Floor(Block):
     ------
     ZeroDivisionError
         If ``value`` contains zero.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -212,6 +227,7 @@ class Floor(Block):
         ------
         ZeroDivisionError
             If ``value`` contains zero.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -232,6 +248,7 @@ class Floor(Block):
         Signal
             Result of floor-dividing ``x`` by ``self.value`` using NumPy
             broadcasting rules.
+
         """
         return x // self.value
 
@@ -250,6 +267,7 @@ class Modulo(Block):
     ------
     ZeroDivisionError
         If ``value`` contains zero.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -266,6 +284,7 @@ class Modulo(Block):
         ------
         ZeroDivisionError
             If ``value`` contains zero.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -286,6 +305,7 @@ class Modulo(Block):
         Signal
             Remainder after dividing ``x`` by ``self.value`` using NumPy
             broadcasting rules.
+
         """
         return x % self.value
 
@@ -299,6 +319,7 @@ class Power(Block):
         Exponent or array of exponents.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, value: SignalLike, name: str | None = None):
@@ -310,6 +331,7 @@ class Power(Block):
             Exponent or array of exponents.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
         self.value = value
@@ -327,6 +349,7 @@ class Power(Block):
         Signal
             Input signal raised element-wise to ``self.value`` using NumPy
             broadcasting rules.
+
         """
         return x**self.value
 
@@ -338,6 +361,7 @@ class Absolute(Block):
     ----------
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str | None = None):
@@ -347,6 +371,7 @@ class Absolute(Block):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
 
@@ -362,6 +387,7 @@ class Absolute(Block):
         -------
         Signal
             Element-wise absolute value of the input signal.
+
         """
         return np.abs(x)
 
@@ -373,6 +399,7 @@ class Negate(Block):
     ----------
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str | None = None):
@@ -382,6 +409,7 @@ class Negate(Block):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
 
@@ -397,6 +425,7 @@ class Negate(Block):
         -------
         Signal
             Negated input signal.
+
         """
         return np.negative(x)
 
@@ -408,6 +437,7 @@ class Conjugate(Block):
     ----------
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str | None = None):
@@ -417,6 +447,7 @@ class Conjugate(Block):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
 
@@ -432,6 +463,7 @@ class Conjugate(Block):
         -------
         Signal
             Element-wise complex conjugate of the input signal.
+
         """
         return np.conj(x)
 
@@ -446,6 +478,7 @@ class Clip(Block):
         lower bound and the maximum value is used as the upper bound.
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, bounds: SignalLike, name: str | None = None):
@@ -458,6 +491,7 @@ class Clip(Block):
             the lower bound and the maximum value is used as the upper bound.
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         bounds = np.asarray(bounds)
         self.lower_bound = np.min(bounds)
@@ -477,6 +511,7 @@ class Clip(Block):
         Signal
             Signal with values restricted to the configured lower and upper
             bounds.
+
         """
         return np.clip(x, a_min=self.lower_bound, a_max=self.upper_bound)
 
@@ -488,6 +523,7 @@ class Minimum(Block):
     ----------
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str | None = None):
@@ -497,6 +533,7 @@ class Minimum(Block):
         ----------
         name : str, optional
             Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
 
@@ -512,6 +549,7 @@ class Minimum(Block):
         -------
         Signal
             Minimum value of the input signal.
+
         """
         return np.min(x)
 
@@ -523,6 +561,7 @@ class Maximum(Block):
     ----------
     name : str, optional
         Optional name used to identify the block within a pipeline.
+
     """
 
     def __init__(self, name: str | None = None):
@@ -531,7 +570,8 @@ class Maximum(Block):
         Parameters
         ----------
         name : str, optional
-        Optional name used to identify the block within a pipeline.
+            Optional name used to identify the block within a pipeline.
+
         """
         super().__init__(name=name)
 
@@ -547,5 +587,6 @@ class Maximum(Block):
         -------
         Signal
             Maximum value of the input signal.
+
         """
         return np.max(x)
