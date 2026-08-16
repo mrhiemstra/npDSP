@@ -136,13 +136,13 @@ jobs:
       - uses: ./.github/actions/setup
 
       - name: Set up Python
-        run: uv python install 3.10
+        run: uv python install 3.14
 
       - name: Install dependencies
-        run: uv sync --locked --group docs --python 3.10
+        run: uv sync --locked --group docs --python 3.14
 
       - name: Build documentation
-        run: uv run --python 3.10 sphinx-build -W -b html docs/source docs/build/html
+        run: uv run --python 3.14 sphinx-build -W -b html docs/source docs/build/html
 
   build:
     name: Build package

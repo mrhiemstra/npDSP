@@ -68,9 +68,3 @@ docs = [
 Documentation = "https://npdsp.readthedocs.io/"
 Repository = "https://github.com/mrhiemstra/npDSP"
 Issues = "https://github.com/mrhiemstra/npDSP/issues"
-
-[tool.pyright]
-exclude = [".venv"]
-pythonVersion = "3.10"
-venvPath = "."
-venv = ".venv"
