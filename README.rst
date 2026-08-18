@@ -1,6 +1,8 @@
 npDSP
 =====
-
+.. image:: https://codecov.io/github/mrhiemstra/npDSP/graph/badge.svg?token=IM36OFMADF 
+ :target: https://codecov.io/github/mrhiemstra/npDSP
+ 
 **Composable digital signal processing in NumPy.**
 
 ``npDSP`` is a lightweight Python library for building digital signal
