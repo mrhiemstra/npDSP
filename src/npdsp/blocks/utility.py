@@ -115,13 +115,13 @@ class Tap(Block):
 
     """
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str | None = None) -> None:
         """Initialize a tap block.
 
         Parameters
         ----------
-        name : str
-            Name used to identify the tap within a pipeline.
+        name : str, optional
+            Optional name used to identify the tap within a pipeline.
 
         """
         super().__init__(name)
@@ -157,13 +157,13 @@ class Copy(Block):
 
     """
 
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str | None = None) -> None:
         """Initialize a copy block.
 
         Parameters
         ----------
-        name : str
-            Name used to identify the block within a pipeline.
+        name : str, optional
+            Optional name used to identify the block within a pipeline.
 
         """
         super().__init__(name)

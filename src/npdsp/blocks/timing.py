@@ -27,9 +27,9 @@ class Delay(Block):
 
     Notes
     -----
-    The delay is applied along the first axis. Additional dimensions are
-    preserved, allowing the block to operate on signals containing multiple
-    channels.
+    The delay is applied along the final axis, which represents samples.
+    Leading dimensions are preserved, allowing the block to operate on signals
+    containing multiple channels.
 
     The block is stateful. Call :meth:`reset` to clear the internal buffer.
 
@@ -46,6 +46,14 @@ class Delay(Block):
         >>> delay = Delay(0)
         >>> delay([1, 2, 3])
         array([1, 2, 3])
+
+    Multi-channel signals work naturally::
+
+        >>> delay = Delay(1)
+        >>> x = np.array([[1, 2, 3], [4, 5, 6]])  # 2 channels, 3 samples
+        >>> delay(x)
+        array([[0, 1, 2],
+               [0, 4, 5]])
 
     """
 
@@ -72,8 +80,7 @@ class Delay(Block):
             raise ValueError("samples must be non-negative")
 
         self.samples = samples
-        # axis=0: Delay's sample axis is the first axis (see class docstring).
-        self._history = SlidingBuffer(samples, axis=0)
+        self._history = SlidingBuffer(samples, axis=-1)
 
     @property
     def stateful(self) -> bool:
@@ -86,8 +93,8 @@ class Delay(Block):
         Parameters
         ----------
         x : Signal
-            Input signal. The first axis represents samples; any additional
-            dimensions are treated as channel or signal dimensions.
+            Input signal. The final axis represents samples; any leading
+            dimensions are treated as channel or batch dimensions.
 
         Returns
         -------
@@ -99,12 +106,12 @@ class Delay(Block):
         if self.samples == 0:
             return x
 
-        n = x.shape[0]
+        n = x.shape[-1]
 
         self._history.prepare(x.shape, x.dtype)
         combined = self._history.extend(x)
 
-        return combined[:n]
+        return combined[..., :n]
 
     def reset(self) -> None:
         """Clear the internal delay buffer.

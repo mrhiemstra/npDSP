@@ -61,36 +61,17 @@ class Lowpass(Pipeline):
     @property
     def fc(self) -> float:
         """Cutoff frequency after normalization if necessary."""
-        if self._f_norm:
-            return self._fc
-        if self.fir.sample_rate is not None:
-            return self._fc / self.fir.sample_rate
-        return self._fc
+        return _fc(self, self._fc)
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
-        if self._use_fixed_coef_len:
-            return None
-        if self._f_norm:
-            return self._ft_or_n
-        if self.fir.sample_rate is not None:
-            return self._ft_or_n / self.fir.sample_rate
-        return self._ft_or_n
+        return _ft(self)
 
     @property
     def num_coefs(self) -> int:
         """Number of filter coefficients used for design."""
-        if self.ft is None:
-            assert not isinstance(self._ft_or_n, float)
-            return self._ft_or_n
-
-        num_coefs = int(np.ceil(4 / self.ft))
-
-        if not (num_coefs % 2) and not self.allow_even_n:
-            num_coefs += 1
-
-        return num_coefs
+        return _num_coefs(self)
 
     @property
     def coefs(self) -> Signal:
@@ -156,36 +137,17 @@ class Highpass(Pipeline):
     @property
     def fc(self) -> float:
         """Highpass cutoff frequency after normalization if necessary."""
-        if self._f_norm:
-            return self._fc
-        if self.fir.sample_rate is not None:
-            return self._fc / self.fir.sample_rate
-        return self._fc
+        return _fc(self, self._fc)
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
-        if self._use_fixed_coef_len:
-            return None
-        if self._f_norm:
-            return self._ft_or_n
-        if self.fir.sample_rate is not None:
-            return self._ft_or_n / self.fir.sample_rate
-        return self._ft_or_n
+        return _ft(self)
 
     @property
     def num_coefs(self) -> int:
         """Number of filter coefficients used for design."""
-        if self.ft is None:
-            assert not isinstance(self._ft_or_n, float)
-            return self._ft_or_n
-
-        num_coefs = int(np.ceil(4 / self.ft))
-
-        if not (num_coefs % 2) and not self.allow_even_n:
-            num_coefs += 1
-
-        return num_coefs
+        return _num_coefs(self)
 
     @property
     def coefs(self) -> Signal:
@@ -260,45 +222,22 @@ class Bandpass(Pipeline):
     @property
     def fc1(self) -> float:
         """Lower band edge frequency after normalization if needed."""
-        if self._f_norm:
-            return self._fc1
-        if self.fir.sample_rate is not None:
-            return self._fc1 / self.fir.sample_rate
-        return self._fc1
+        return _fc(self, self._fc1)
 
     @property
     def fc2(self) -> float:
         """Upper band edge frequency after normalization if needed."""
-        if self._f_norm:
-            return self._fc2
-        if self.fir.sample_rate is not None:
-            return self._fc2 / self.fir.sample_rate
-        return self._fc2
+        return _fc(self, self._fc2)
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
-        if self._use_fixed_coef_len:
-            return None
-        if self._f_norm:
-            return self._ft_or_n
-        if self.fir.sample_rate is not None:
-            return self._ft_or_n / self.fir.sample_rate
-        return self._ft_or_n
+        return _ft(self)
 
     @property
     def num_coefs(self) -> int:
         """Number of filter coefficients used for design."""
-        if self.ft is None:
-            assert not isinstance(self._ft_or_n, float)
-            return self._ft_or_n
-
-        num_coefs = int(np.ceil(4 / self.ft))
-
-        if not (num_coefs % 2) and not self.allow_even_n:
-            num_coefs += 1
-
-        return num_coefs
+        return _num_coefs(self)
 
     @property
     def coefs(self) -> Signal:
@@ -370,45 +309,22 @@ class Bandstop(Pipeline):
     @property
     def fc1(self) -> float:
         """Lower stopband frequency after normalization if needed."""
-        if self._f_norm:
-            return self._fc1
-        if self.fir.sample_rate is not None:
-            return self._fc1 / self.fir.sample_rate
-        return self._fc1
+        return _fc(self, self._fc1)
 
     @property
     def fc2(self) -> float:
         """Upper stopband frequency after normalization if needed."""
-        if self._f_norm:
-            return self._fc2
-        if self.fir.sample_rate is not None:
-            return self._fc2 / self.fir.sample_rate
-        return self._fc2
+        return _fc(self, self._fc2)
 
     @property
     def ft(self) -> float | None:
         """Transition width after normalization, or None for fixed length."""
-        if self._use_fixed_coef_len:
-            return None
-        if self._f_norm:
-            return self._ft_or_n
-        if self.fir.sample_rate is not None:
-            return self._ft_or_n / self.fir.sample_rate
-        return self._ft_or_n
+        return _ft(self)
 
     @property
     def num_coefs(self) -> int:
         """Number of filter coefficients used for design."""
-        if self.ft is None:
-            assert not isinstance(self._ft_or_n, float)
-            return self._ft_or_n
-
-        num_coefs = int(np.ceil(4 / self.ft))
-
-        if not (num_coefs % 2) and not self.allow_even_n:
-            num_coefs += 1
-
-        return num_coefs
+        return _num_coefs(self)
 
     @property
     def coefs(self) -> Signal:
@@ -421,3 +337,35 @@ class Bandstop(Pipeline):
         c /= np.sum(c)
 
         return c
+
+
+def _fc(self: Lowpass | Highpass | Bandpass | Bandstop, fc: float):
+    if self._f_norm:
+        return fc
+    if self.fir.sample_rate is not None:
+        return fc / self.fir.sample_rate
+    return fc
+
+
+def _ft(self: Lowpass | Highpass | Bandpass | Bandstop) -> float | None:
+    """Transition width after normalization, or None for fixed length."""
+    if self._use_fixed_coef_len:
+        return None
+    if self._f_norm:
+        return self._ft_or_n
+    if self.fir.sample_rate is not None:
+        return self._ft_or_n / self.fir.sample_rate
+    return self._ft_or_n
+
+
+def _num_coefs(self: Lowpass | Highpass | Bandpass | Bandstop) -> int:
+    if self.ft is None:
+        assert not isinstance(self._ft_or_n, float)
+        return self._ft_or_n
+
+    num_coefs = int(np.ceil(4 / self.ft))
+
+    if not (num_coefs % 2) and not self.allow_even_n:
+        num_coefs += 1
+
+    return num_coefs

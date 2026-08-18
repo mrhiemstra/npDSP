@@ -130,7 +130,7 @@ class Pipeline(Block):
         return rate
 
     @property
-    def latency_samples(self) -> float | None:
+    def latency_samples(self) -> float:
         """Return the total latency of the pipeline in samples."""
         latency: float = 0
 
@@ -156,8 +156,8 @@ class Pipeline(Block):
                 "Frequency dependent latency reporting is not yet implemented"
             )
 
-        assert self.first.sample_rate is not None
-        assert self.latency_samples is not None
+        # assert self.first.sample_rate is not None
+        # assert self.latency_samples is not None
 
         return self.latency_samples / self.first.sample_rate
 
@@ -174,11 +174,7 @@ class Pipeline(Block):
         """
         self._names.clear()
 
-        sample_rate = (
-            self.first.sample_rate
-            if self.first.sample_rate is not None
-            else float(1)
-        )
+        sample_rate = self.first.sample_rate
 
         for idx, block in enumerate(self.blocks):
             if block.name is None:

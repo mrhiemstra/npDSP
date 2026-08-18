@@ -424,6 +424,31 @@ def test_fir_per_channel_coefficients_must_match_input_channels() -> None:
         )
 
 
+def test_fir_per_channel_coefficients_must_match_input_channels_ndim3() -> None:
+    fir = FIR(
+        [
+            [
+                [1, 2, 3],
+            ]
+        ]
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=r"Coefficient channel count \(1\) does not match input \(2\)",
+    ):
+        fir([[[1, 2, 3], [1, 2, 3]]])
+
+
+def test_fir_0d_coefficients_not_supported() -> None:
+
+    with pytest.raises(
+        ValueError,
+        match=r"FIR coefficients cannot be empty",
+    ):
+        FIR([])
+
+
 # ---------------------------------------------------------------------------
 # Complex data
 # ---------------------------------------------------------------------------
@@ -871,4 +896,44 @@ def test_fir_profile_reset() -> None:
     assert np.array_equal(
         result,
         [1],
+    )
+
+
+def test_fir_latency_property() -> None:
+    fir = FIR([1, 2, 3])
+    assert fir.latency_samples == 1
+
+
+def test_fir_is_type1() -> None:
+    fir = FIR([1, 2, 1])
+    assert fir.type == 1
+
+
+def test_fir_is_type2() -> None:
+    fir = FIR([1, 2, 2, 1])
+    assert fir.type == 2
+
+
+def test_fir_is_type3() -> None:
+    fir = FIR([1, 2, 0, -2, -1])
+    assert fir.type == 3
+
+
+def test_fir_is_type4() -> None:
+    fir = FIR([1, 2, -2, -1])
+    assert fir.type == 4
+
+
+def test_fir_is_not_any_type() -> None:
+    fir = FIR([1, 2, 3, -2, -1])
+    assert fir.type is None
+
+
+def test_fir_2ch_1coef() -> None:
+    fir = FIR([[1, 1]])
+    y = fir.process(np.array([[1, 1]]))
+
+    assert np.array_equal(
+        np.array([[1, 2]]),
+        y,
     )

@@ -37,5 +37,8 @@ def math_pipeline() -> Pipeline:
 
 
 @pytest.fixture
-def fir1() -> FIR:
+def fir1():
+    """Common FIR filter for tests."""
+    from npdsp import FIR
+
     return FIR([1, 2, 3], name="fir1")

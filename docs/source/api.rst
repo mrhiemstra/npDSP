@@ -25,6 +25,7 @@ Blocks
    generated/api/Clip
    generated/api/Conjugate
    generated/api/Convert
+   generated/api/Copy
    generated/api/Delay
    generated/api/Divide
    generated/api/Downsample
@@ -39,6 +40,7 @@ Blocks
    generated/api/Negate
    generated/api/Power
    generated/api/ResetCounter
+   generated/api/SampleRate
    generated/api/Subtract
    generated/api/Tap
    generated/api/Upsample

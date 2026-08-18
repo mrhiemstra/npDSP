@@ -207,7 +207,7 @@ class FIR(Block):
                         f"does not match input ({channels})"
                     )
                 coefs_ch = coefs
-        elif coefs.ndim > 2:
+        else:  # coefs.ndim > 2:
             # Flatten leading dimensions to match channels
             coefs_flat = coefs.reshape(-1, taps)
             if coefs_flat.shape[0] != channels:
@@ -216,8 +216,6 @@ class FIR(Block):
                     f"does not match input ({channels})"
                 )
             coefs_ch = coefs_flat
-        else:
-            raise ValueError("Coefficients must be 1D or 2D")
 
         dtype = np.result_type(
             x.dtype,
@@ -233,79 +231,27 @@ class FIR(Block):
         x_work = x_work.astype(dtype, copy=False)
         coefs_ch = coefs_ch.astype(dtype, copy=False)
 
-        if self._jitted_process is None:
-            # First call: compile JIT for this tap count and dtype
-            self._jitted_process = self._make_jitted_process(taps, dtype)
-
-        assert self._jitted_process is not None
-        assert self._state is not None
-
-        y = self._jitted_process(x_work, coefs_ch, self._state)
+        y = self._jit_process(x_work, coefs_ch, self._state)
 
         return y[0] if one_dimensional else y.reshape(x.shape)
 
     @staticmethod
-    def _make_jitted_process(
-        taps: int,
-        dtype: np.dtype,  # noqa: ARG004
-    ) -> ProcessFn:
-        """Create tap-specific JIT-compiled process function."""
-        if taps == 1:
+    @numba.njit
+    def _jit_process(x_work: Signal, coefs: Signal, state: Signal) -> Signal:
+        channels, n_samples = x_work.shape
+        taps_val = coefs.shape[1]
+        y = np.empty_like(x_work)
 
-            @numba.njit
-            def jit_taps1(
-                x_work: Signal,
-                coefs: Signal,
-                state: Signal,  # noqa: ARG001
-            ) -> Signal:
-                y = np.empty_like(x_work)
-                y[:, :] = coefs[:, 0:1] * x_work
-                return y
+        for c in range(channels):
+            for n in range(n_samples):
+                xn = x_work[c, n]
+                yn = coefs[c, 0] * xn
+                for k in range(1, taps_val):
+                    yn += coefs[c, k] * state[c, taps_val - k - 1]
+                y[c, n] = yn
 
-            return jit_taps1
+                for i in range(taps_val - 2):
+                    state[c, i] = state[c, i + 1]
+                state[c, taps_val - 2] = xn
 
-        if taps == 2:
-
-            @numba.njit
-            def jit_taps2(
-                x_work: Signal, coefs: Signal, state: Signal
-            ) -> Signal:
-                channels, n_samples = x_work.shape
-                y = np.empty_like(x_work)
-                for c in range(channels):
-                    s0 = state[c, 0]
-                    for n in range(n_samples):
-                        xn = x_work[c, n]
-                        yn = coefs[c, 0] * xn + coefs[c, 1] * s0
-                        y[c, n] = yn
-                        s0 = xn
-                    state[c, 0] = s0
-                return y
-
-            return jit_taps2
-
-        # taps > 2
-
-        @numba.njit
-        def jit_taps_general(
-            x_work: Signal, coefs: Signal, state: Signal
-        ) -> Signal:
-            channels, n_samples = x_work.shape
-            taps_val = coefs.shape[1]
-            y = np.empty_like(x_work)
-
-            for c in range(channels):
-                for n in range(n_samples):
-                    xn = x_work[c, n]
-                    yn = coefs[c, 0] * xn
-                    for k in range(1, taps_val):
-                        yn += coefs[c, k] * state[c, taps_val - k - 1]
-                    y[c, n] = yn
-
-                    for i in range(taps_val - 2):
-                        state[c, i] = state[c, i + 1]
-                    state[c, taps_val - 2] = xn
-
-            return y
-
-        return jit_taps_general
+        return y

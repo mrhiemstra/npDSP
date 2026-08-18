@@ -417,7 +417,7 @@ def test_iir_per_channel_coefficients() -> None:
     )
 
 
-def test_iir_wrong_number_of_per_channel_coefficients_raises() -> None:
+def test_iir_wrong_number_of_per_channel_coefficients_raises_b() -> None:
     with pytest.raises(
         ValueError,
         match=r"b is 2D \(per-channel\) but a is 1D \(shared\); both must be 1D or both must be 2D with matching channel counts",
@@ -428,6 +428,20 @@ def test_iir_wrong_number_of_per_channel_coefficients_raises() -> None:
                 [3, 4],
             ],
             a=[1],
+        )
+
+
+def test_iir_wrong_number_of_per_channel_coefficients_raises_a() -> None:
+    with pytest.raises(
+        ValueError,
+        match=r"a is 2D \(per-channel\) but b is 1D \(shared\); both must be 1D or both must be 2D with matching channel counts",
+    ):
+        IIR(
+            b=[1],
+            a=[
+                [1, 2],
+                [3, 4],
+            ],
         )
 
 
@@ -518,6 +532,25 @@ def test_iir_reset_allows_new_channel_shape() -> None:
         result,
         expected,
     )
+
+
+def test_single_row_coefficients_broadcast_across_channels():
+    iir = IIR(
+        b=np.array([[1.0, 0.0]]),
+        a=np.array([[1.0, 0.0]]),
+    )
+
+    x = np.array(
+        [
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 10.0, 11.0, 12.0],
+        ]
+    )
+
+    y = iir.process(x)
+
+    np.testing.assert_allclose(y, x)
 
 
 # ---------------------------------------------------------------------------

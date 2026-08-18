@@ -40,9 +40,9 @@ def test_delay_single_channel_across_calls(delay: Delay) -> None:
 def test_delay_multichannel(delay: Delay) -> None:
     x = np.array(
         [
-            [1, 10],
-            [2, 20],
-            [3, 30],
+            [1, 10, 100],
+            [2, 20, 200],
+            [3, 30, 300],
         ]
     )
 
@@ -52,9 +52,9 @@ def test_delay_multichannel(delay: Delay) -> None:
         y,
         np.array(
             [
-                [0, 0],
-                [0, 0],
-                [1, 10],
+                [0, 0, 1],
+                [0, 0, 2],
+                [0, 0, 3],
             ]
         ),
     )
@@ -64,9 +64,9 @@ def test_delay_multichannel_across_calls(delay: Delay) -> None:
     y1 = delay(
         np.array(
             [
-                [1, 10],
-                [2, 20],
-                [3, 30],
+                [1, 10, 100],
+                [2, 20, 200],
+                [3, 30, 300],
             ]
         )
     )
@@ -74,9 +74,9 @@ def test_delay_multichannel_across_calls(delay: Delay) -> None:
     y2 = delay(
         np.array(
             [
-                [4, 40],
-                [5, 50],
-                [6, 60],
+                [4, 40, 4000],
+                [5, 50, 5000],
+                [6, 60, 6000],
             ]
         )
     )
@@ -85,9 +85,9 @@ def test_delay_multichannel_across_calls(delay: Delay) -> None:
         y1,
         np.array(
             [
-                [0, 0],
-                [0, 0],
-                [1, 10],
+                [0, 0, 1],
+                [0, 0, 2],
+                [0, 0, 3],
             ]
         ),
     )
@@ -96,9 +96,9 @@ def test_delay_multichannel_across_calls(delay: Delay) -> None:
         y2,
         np.array(
             [
-                [2, 20],
-                [3, 30],
-                [4, 40],
+                [10, 100, 4],
+                [20, 200, 5],
+                [30, 300, 6],
             ]
         ),
     )
@@ -157,3 +157,7 @@ def test_delay_preserves_shape() -> None:
     y = delay(x)
 
     assert y.shape == x.shape
+
+
+def test_delay_is_stateful(delay: Delay):
+    assert delay.stateful is True

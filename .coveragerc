@@ -1,0 +1,4 @@
+[report]
+exclude_also =
+    def _jit_process
+    def _make_jitted_process

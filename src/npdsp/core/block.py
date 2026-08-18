@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from time import perf_counter
 from typing import TYPE_CHECKING
 
@@ -15,7 +14,7 @@ if TYPE_CHECKING:
     from .typing import Signal, SignalLike
 
 
-class Block(ABC):
+class Block:
     """Base class for all npDSP processing blocks.
 
     A block transforms an input signal into an output signal. Blocks can be
@@ -34,7 +33,6 @@ class Block(ABC):
 
     """
 
-    @abstractmethod
     def process(self, x: Signal) -> Signal:
         """Process an input signal.
 
@@ -54,7 +52,9 @@ class Block(ABC):
             Raised if a subclass does not implement this method.
 
         """
-        raise NotImplementedError
+        raise NotImplementedError(
+            "The block base class does not have any associated process function"
+        )
 
     @property
     def stateful(self) -> bool:
@@ -80,7 +80,7 @@ class Block(ABC):
         return 0
 
     @property
-    def sample_rate(self) -> float | None:
+    def sample_rate(self) -> float:
         """Return the effective sample rate of the block."""
         return self._sample_rate
 
@@ -167,7 +167,7 @@ class Block(ABC):
 
         """
         self.name = name
-        self._sample_rate: float | None = None
+        self._sample_rate: float = 1
 
     def __call__(self, x: SignalLike) -> Signal:
         """Process a signal by calling the block.

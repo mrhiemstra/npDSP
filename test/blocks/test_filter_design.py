@@ -161,6 +161,21 @@ def test_lowpass_design_can_use_fixed_coefficient_length() -> None:
     assert len(block.coefs) == 9
 
 
+def test_highpass_design_can_use_fixed_coefficient_length() -> None:
+    block = design.Highpass(
+        fc=0.1,
+        ft_or_n=9,
+        f_norm=True,
+        window=window.Rectangular,
+        use_fixed_coef_len=True,
+        name="fixed_highpass",
+    )
+
+    assert block.ft is None
+    assert block.num_coefs == 9
+    assert len(block.coefs) == 9
+
+
 def test_lowpass_design_can_allow_even_num_coefs() -> None:
     block = design.Lowpass(
         fc=0.1,

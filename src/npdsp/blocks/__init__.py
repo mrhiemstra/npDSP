@@ -4,6 +4,7 @@ from .conversion import Convert, Downsample, Upsample
 from .filters import design, impulse_response, window
 from .fir import FIR
 from .iir import IIR
+from .io import SampleRate
 from .math import (
     Absolute,
     Add,
@@ -20,7 +21,7 @@ from .math import (
     Subtract,
 )
 from .timing import Delay
-from .utility import Lambda, ResetCounter, Tap
+from .utility import Copy, Lambda, ResetCounter, Tap
 
 __all__ = [
     "FIR",
@@ -30,6 +31,7 @@ __all__ = [
     "Clip",
     "Conjugate",
     "Convert",
+    "Copy",
     "Delay",
     "Divide",
     "Downsample",
@@ -38,6 +40,7 @@ __all__ = [
     "Maximum",
     "Minimum",
     "Modulo",
+    "SampleRate",
     "Multiply",
     "Negate",
     "Power",

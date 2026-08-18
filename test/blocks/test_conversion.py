@@ -3,7 +3,12 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from npdsp import Downsample, Upsample
+from npdsp import Convert, Downsample, Upsample
+
+
+@pytest.fixture
+def convert() -> Convert:
+    return Convert(np.float32)
 
 
 @pytest.fixture
@@ -145,4 +150,31 @@ def test_upsample_stream(upsample: Upsample) -> None:
     np.testing.assert_array_equal(
         y,
         np.array([4, 0, 0, 0, 5, 0, 0, 0]),
+    )
+
+
+def test_downsample_sample_rate_ratio(downsample: Downsample) -> None:
+    assert downsample.sample_rate_ratio == 1 / 4
+
+
+def test_upsample_sample_rate_ratio(upsample: Upsample) -> None:
+    assert upsample.sample_rate_ratio == 4
+
+
+def test_downsample_is_stateful(downsample: Downsample) -> None:
+    assert downsample.stateful is True
+
+
+def test_upsample_is_not_stateful(upsample: Upsample) -> None:
+    assert upsample.stateful is False
+
+
+def test_convert_single_conversion(convert: Convert) -> None:
+    x = np.array([1, 2, 3], dtype=np.int32)
+
+    y = convert(x)
+
+    np.testing.assert_array_equal(
+        y,
+        np.array([1, 2, 3], dtype=np.float32),
     )

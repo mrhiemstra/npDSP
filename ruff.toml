@@ -26,6 +26,7 @@ select = [
     "PERF", # Perflint
     "N",    # pep8-naming
     "NPY",  # NumPy
+    "Q"
 ]
 ignore = ["E501", "F403", "F405", "D203", "D213"]
 

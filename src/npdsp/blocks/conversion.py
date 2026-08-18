@@ -158,7 +158,7 @@ class Downsample(Block):
     @property
     def sample_rate_ratio(self):
         """Return the sample rate ratio of the downsample block."""
-        return self.factor
+        return 1 / self.factor
 
     def reset(self) -> None:
         """Reset the downsample block's internal state."""

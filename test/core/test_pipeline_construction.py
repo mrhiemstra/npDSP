@@ -113,3 +113,18 @@ def test_pipeline_length(
     pipeline: Pipeline,
 ) -> None:
     assert len(pipeline) == 3
+
+
+def test_pipeline_rshift(
+    pipeline: Pipeline,
+) -> None:
+    assert len(pipeline >> (Tap("tap4") >> Tap("tap5"))) == 5
+
+
+def test_pipeline_can_print(
+    pipeline: Pipeline,
+) -> None:
+    assert (
+        pipeline.__repr__()
+        == "Tap(name='tap1') >> Tap(name='tap2') >> Tap(name='tap3')"
+    )

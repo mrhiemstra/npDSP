@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from npdsp import *
 
@@ -249,3 +250,24 @@ def test_subtract() -> None:
         ),
         [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
     )
+
+
+def test_divide_by_zero_raises_error() -> None:
+    with pytest.raises(
+        ZeroDivisionError, match="Divide value cannot contain zero"
+    ):
+        Divide(0)
+
+
+def test_floor_by_zero_raises_error() -> None:
+    with pytest.raises(
+        ZeroDivisionError, match="Floor value cannot contain zero"
+    ):
+        Floor(0)
+
+
+def test_modulo_by_zero_raises_error() -> None:
+    with pytest.raises(
+        ZeroDivisionError, match="Modulus value cannot contain zero"
+    ):
+        Modulo(0)
