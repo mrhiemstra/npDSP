@@ -170,14 +170,14 @@ jobs:
       - name: Test built wheel
         run: |
           uv venv /tmp/test-wheel-env --python 3.14
-          /tmp/test-wheel-env/bin/pip install ${{ github.workspace }}/dist/*.whl
-          /tmp/test-wheel-env/bin/python -c "import npdsp; print(f'npdsp successfully installed from wheel')"
+          uv pip install --python /tmp/test-wheel-env ${{ github.workspace }}/dist/*.whl
+          /tmp/test-wheel-env/bin/python -c "import npdsp; print('npdsp successfully installed from wheel')" 
 
       - name: Test built sdist
         run: |
           uv venv /tmp/test-sdist-env --python 3.14
-          /tmp/test-sdist-env/bin/pip install ${{ github.workspace }}/dist/*.tar.gz
-          /tmp/test-sdist-env/bin/python -c "import npdsp; print(f'npdsp successfully installed from sdist')"
+          uv pip install --python /tmp/test-sdist-env ${{ github.workspace }}/dist/*.tar.gz
+          /tmp/test-sdist-env/bin/python -c "import npdsp; print('npdsp successfully installed from sdist')"
 
       - name: Upload package
         uses: actions/upload-artifact@v4
