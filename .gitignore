@@ -31,6 +31,8 @@ ENV/
 htmlcov/
 .tox/
 .nox/
+coverage.xml
+junit.xml
 
 # =========================
 # Type checking / linters
