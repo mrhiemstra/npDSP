@@ -7,7 +7,6 @@ permissions:
   contents: read
 
 jobs:
-
   lock_file:
     runs-on: ubuntu-latest
 
@@ -98,7 +97,7 @@ jobs:
         run: uv sync --locked --python ${{ matrix.python-version }}
 
       - name: Run tests
-        run: uv run --python ${{ matrix.python-version }} pytest test --benchmark-skip
+        run: uv run --python ${{ matrix.python-version }} pytest test --benchmark-skip -n auto
 
       - name: Run benchmarks
         if: github.ref_type == 'tag'
