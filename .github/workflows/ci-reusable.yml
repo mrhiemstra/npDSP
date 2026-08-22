@@ -124,7 +124,7 @@ jobs:
         run: uv run --python 3.14 pytest test --cov=src/npdsp --cov-report=xml --junitxml=junit.xml
 
       - name: Upload coverage and test results to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
