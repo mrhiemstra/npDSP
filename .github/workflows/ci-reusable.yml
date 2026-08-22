@@ -124,7 +124,7 @@ jobs:
         run: uv run --python 3.14 pytest test --cov=src/npdsp --cov-report=xml --junitxml=junit.xml
 
       - name: Upload coverage and test results to Codecov
-        uses: codecov/codecov-action@v7
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
@@ -179,7 +179,7 @@ jobs:
           /tmp/test-sdist-env/bin/python -c "import npdsp; print('npdsp successfully installed from sdist')"
 
       - name: Upload package
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@bbbca2d4f2c6b6b6f7f1f2c0f7f6e2b7e5f9a6c4 # v7.0.0
         with:
           name: npdsp-dist
           path: dist/
