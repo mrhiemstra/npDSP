@@ -179,7 +179,7 @@ jobs:
           /tmp/test-sdist-env/bin/python -c "import npdsp; print('npdsp successfully installed from sdist')"
 
       - name: Upload package
-        uses: actions/upload-artifact@bbbca2d4f2c6b6b6f7f1f2c0f7f6e2b7e5f9a6c4 # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: npdsp-dist
           path: dist/
