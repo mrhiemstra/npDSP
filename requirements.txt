@@ -563,9 +563,9 @@ typing-extensions==4.16.0 \
     #   npdsp
     #   pyright
     #   virtualenv
-virtualenv==21.14.0 \
-    --hash=sha256:c345b0b744c70e7df7e33be20ea1ba5309db1cca3c98eacc10afb0276cf99356 \
-    --hash=sha256:c3c0dbdf7259316edbb993020206ee7f7664a33063292dcc4a618e4c04cdf450
+virtualenv==21.14.5 \
+    --hash=sha256:b0651e0174982bba17cc6f0aaa2ef496730cb85a3f35eb5d1119d1c904f7d1da \
+    --hash=sha256:c4cb6c13e46b57225a999c7e22a09b163393878facc7ac4c059a57f46faa1647
     # via pre-commit
 wcwidth==0.9.1 \
     --hash=sha256:03cfca3dcbffa86564290fe3c9978a6191ba003e8ced7f7dbda315fcb3fbe725 \
